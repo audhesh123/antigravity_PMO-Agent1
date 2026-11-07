@@ -1,0 +1,6 @@
+Service Name,Target Cloud,Owner,Current Status,Cutover Date,Risk Level,Blockers
+Kubernetes Cluster EKS,AWS us-east-1,David Chen,Completed,2026-11-04,Low,None
+PostgreSQL Aurora Multi-AZ,AWS us-east-1,Sanjay Gupta,In Progress,2026-11-12,High,DMS Replication lag of 45 seconds during load test
+Redis Elasticache Cluster,AWS us-east-1,Maria Torres,Completed,2026-11-05,Low,None
+HashiCorp Vault Secrets Sync,AWS us-east-1,David Chen,Blocked,2026-11-08,Critical,Cross-account IAM role trust policy rejected by Security team
+Kafka Event Streaming,AWS us-east-1,Sanjay Gupta,In Progress,2026-11-15,Medium,Broker throughput sizing review pending

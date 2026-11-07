@@ -1,0 +1,20 @@
+{
+  "name": "ai-status-reporting-agent",
+  "version": "1.0.0",
+  "description": "AI-Powered Daily & Weekly Status Reporting Agent with Automated Reminders and Multi-Format Ingestion",
+  "main": "server/index.js",
+  "scripts": {
+    "start": "node server/index.js",
+    "dev": "node --watch server/index.js"
+  },
+  "keywords": ["ai", "dsr", "wsr", "reporting", "status-report", "reminders", "executive-dashboard"],
+  "author": "Antigravity AI",
+  "license": "MIT",
+  "dependencies": {
+    "cors": "^2.8.5",
+    "express": "^4.21.2",
+    "multer": "^1.4.5-lts.1",
+    "node-cron": "^3.0.3",
+    "xlsx": "^0.18.5"
+  }
+}

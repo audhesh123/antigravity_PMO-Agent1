@@ -1,0 +1,294 @@
+[
+  {
+    "id": "rep_dsr_fintech_01",
+    "reportType": "DSR",
+    "reportDate": "Thursday, Nov 6, 2026",
+    "projectName": "Fintech Mobile Banking App 3.0",
+    "projectHealth": {
+      "status": "Amber",
+      "rationale": "Caution state: 1 critical third-party vendor dependency on Stripe SecOps keys blocking payments release candidate.",
+      "trend": "Watch closely",
+      "confidenceScore": 95
+    },
+    "executiveSummary": "On Thursday, Nov 6, 2026, the Fintech Mobile Banking App 3.0 team completed 3 critical deliverables including Biometric FaceID authentication and Avatar compression. Overall project health is AMBER due to an external SecOps key delay stalling the payments checkout stream.",
+    "workCompletedToday": [
+      {
+        "task": "Implement Biometric FaceID / TouchID Login with Keychain validation",
+        "owner": "Marcus Vance",
+        "notes": "Passed unit and local security sandbox tests",
+        "source": "Excel Tracker"
+      },
+      {
+        "task": "User Profile Avatar Compression & S3 Upload pipeline",
+        "owner": "Marcus Vance",
+        "notes": "Reduced image payload by 65% via WebP converter",
+        "source": "Excel Tracker"
+      },
+      {
+        "task": "UI Dark Mode Contrast Accessibility Compliance (WCAG 2.1 AAA)",
+        "owner": "Sarah Jenkins",
+        "notes": "Audit passed with zero contrast warnings",
+        "source": "Excel Tracker"
+      }
+    ],
+    "tasksInProgress": [
+      {
+        "task": "Connect Stripe 3D-Secure 2.0 Payment Gateway",
+        "owner": "Priya Sharma",
+        "status": "Blocked on Vendor",
+        "dueDate": "Target: Nov 7",
+        "source": "Excel Tracker"
+      },
+      {
+        "task": "Offline SQLite Cache Synchronization Engine",
+        "owner": "Dave Miller",
+        "status": "In Progress",
+        "dueDate": "Target: Nov 10",
+        "source": "Standup Notes"
+      },
+      {
+        "task": "Push Notification PushKit & APNS Payload Optimization",
+        "owner": "Elena Rostova",
+        "status": "In Progress",
+        "dueDate": "Target: Nov 9",
+        "source": "Excel Tracker"
+      }
+    ],
+    "upcomingActivities": [
+      {
+        "task": "Escalate Stripe SecOps webhook signing keys to Vendor Director",
+        "owner": "Sarah Jenkins",
+        "targetDate": "Nov 7, 11:30 AM"
+      },
+      {
+        "task": "Merge Room DB schema migration backward compatibility fallback",
+        "owner": "Dave Miller & Elena Rostova",
+        "targetDate": "Nov 7, EOD"
+      },
+      {
+        "task": "Deploy test build to TestFlight internal tester ring",
+        "owner": "Marcus Vance",
+        "targetDate": "Nov 8"
+      }
+    ],
+    "blockersAndDependencies": [
+      {
+        "description": "Awaiting production webhook signing secret key from SecOps vendor for Stripe 3DS2 checkout",
+        "relatedTask": "Connect Stripe 3D-Secure 2.0 Payment Gateway",
+        "owner": "Priya Sharma / Sarah Jenkins",
+        "severity": "High",
+        "impact": "Halts release candidate candidate build if not resolved within 24h"
+      },
+      {
+        "description": "CI runner upgrade to macOS 14 required for iOS 18 Detox automated testing",
+        "relatedTask": "Automated End-to-End Detox Testing Suite",
+        "owner": "Raj Patel",
+        "severity": "Medium",
+        "impact": "Temporary workaround using dedicated local Mac Mini runner"
+      }
+    ],
+    "risksAndIssues": [
+      {
+        "risk": "Third-party vendor SLA breach on security key approval",
+        "severity": "High",
+        "mitigation": "PM scheduled direct executive sync with vendor director for emergency turnaround"
+      },
+      {
+        "risk": "Room DB schema migration conflict on Android devices with old cache",
+        "severity": "Medium",
+        "mitigation": "Enforced non-destructive migration fallback routine in code review"
+      }
+    ],
+    "keyDecisions": [
+      {
+        "decision": "Maintain backward compatibility with Room schema v2 fallback to prevent user session loss",
+        "owner": "Elena Rostova & Dave Miller"
+      },
+      {
+        "decision": "Run Detox automated testing on dedicated local Mac Mini until cloud CI runners upgrade",
+        "owner": "Sarah Jenkins (PM)"
+      }
+    ],
+    "actionItems": [
+      {
+        "task": "Escalate webhook signing secret with SecOps Vendor Director",
+        "owner": "Sarah Jenkins",
+        "priority": "High",
+        "status": "Pending"
+      },
+      {
+        "task": "Review and approve Dave's Room DB migration PR",
+        "owner": "Elena Rostova",
+        "priority": "High",
+        "status": "Pending"
+      }
+    ],
+    "additionalComments": "Overall velocity is high with 88% of sprint scope on track. Payment blocker is actively being managed.",
+    "confirmedFactsCount": 7,
+    "aiObservationsCount": 2,
+    "missingInformation": [],
+    "clarificationNeeded": false,
+    "createdAt": "2026-11-06T17:30:00.000Z",
+    "updatedAt": "2026-11-07T21:06:40.491Z"
+  },
+  {
+    "id": "rep_wsr_cloud_02",
+    "reportType": "WSR",
+    "reportingWeek": "Week 45 (Nov 02 - Nov 06, 2026)",
+    "projectName": "Enterprise AWS Cloud Migration & Security Modernization",
+    "projectHealth": {
+      "status": "Amber",
+      "rationale": "Database replication lag during peak load testing requires parameter tuning; HashiCorp Vault cross-account trust policy pending security sign-off.",
+      "trend": "Stable",
+      "confidenceScore": 96
+    },
+    "executiveSummary": "For Week 45, the Enterprise AWS Cloud Migration team completed major infrastructure milestones including Amazon EKS Kubernetes cluster provisioning and Redis ElastiCache multi-node rollout. Project health is AMBER as we resolve cross-account IAM trust policies and Aurora PostgreSQL replication latency ahead of scheduled cutover.",
+    "managementAttentionRequired": "ATTENTION ADVISED: HashiCorp Vault cross-account IAM trust role requires Principal Security Architect sign-off by Monday 2 PM to avoid pushing the staging cutover window by 48 hours.",
+    "keyAccomplishments": [
+      {
+        "headline": "Kubernetes EKS Production Cluster Provisioned",
+        "impact": "Fully configured with Terraform, Karpenter auto-scaling, and Datadog agents",
+        "owner": "David Chen",
+        "type": "Confirmed Fact"
+      },
+      {
+        "headline": "Redis ElastiCache Cluster Multi-AZ Deployed",
+        "impact": "Zero-latency session cache benchmarked at 180,000 ops/sec",
+        "owner": "Maria Torres",
+        "type": "Confirmed Fact"
+      },
+      {
+        "headline": "Network VPC Peering & Transit Gateway Routing Verified",
+        "impact": "Secured encrypted low-latency tunnel between on-prem data center and AWS",
+        "owner": "David Chen",
+        "type": "Confirmed Fact"
+      }
+    ],
+    "tasksCompleted": [
+      {
+        "task": "Kubernetes Cluster EKS deployment in AWS us-east-1",
+        "owner": "David Chen",
+        "source": "Confirmed Fact"
+      },
+      {
+        "task": "Redis ElastiCache Multi-AZ Cluster rollout",
+        "owner": "Maria Torres",
+        "source": "Confirmed Fact"
+      }
+    ],
+    "tasksInProgress": [
+      {
+        "task": "PostgreSQL Aurora Multi-AZ database synchronization",
+        "owner": "Sanjay Gupta",
+        "status": "In Progress",
+        "targetDate": "Nov 12"
+      },
+      {
+        "task": "Kafka Event Streaming broker throughput stress test",
+        "owner": "Sanjay Gupta",
+        "status": "In Progress",
+        "targetDate": "Nov 15"
+      }
+    ],
+    "plannedActivitiesNextWeek": [
+      {
+        "activity": "Execute Aurora DMS replication latency parameter tuning with AWS Enterprise Support",
+        "owner": "Sanjay Gupta",
+        "targetRelease": "Nov 10",
+        "priority": "High"
+      },
+      {
+        "activity": "Resolve HashiCorp Vault cross-account IAM role trust policy",
+        "owner": "David Chen",
+        "targetRelease": "Nov 09",
+        "priority": "Critical"
+      },
+      {
+        "activity": "Conduct initial dry-run cutover rehearsal for non-critical telemetry microservices",
+        "owner": "Cloud Platform Pod",
+        "targetRelease": "Nov 13",
+        "priority": "High"
+      }
+    ],
+    "milestonesAchieved": [
+      {
+        "milestone": "Core Compute & Caching Layer Infrastructure Certified",
+        "dateAchieved": "Nov 05",
+        "status": "Achieved"
+      }
+    ],
+    "milestonesUpcoming": [
+      {
+        "milestone": "Staging Workload Cutover & End-to-End Smoke Test",
+        "targetDate": "Nov 14",
+        "status": "Scheduled",
+        "owner": "David Chen & Cloud Team"
+      },
+      {
+        "milestone": "Production Database Full Cutover",
+        "targetDate": "Nov 21",
+        "status": "Scheduled",
+        "owner": "Sanjay Gupta"
+      }
+    ],
+    "risksAndIssues": [
+      {
+        "risk": "Database DMS replication latency exceeding 30-second target during batch bursts",
+        "probability": "Medium",
+        "impact": "High",
+        "mitigation": "Upgrading DMS replication instance to c6i.2xlarge and adjusting commit batch thresholds",
+        "owner": "Sanjay Gupta",
+        "type": "AI Observation"
+      },
+      {
+        "risk": "HashiCorp Vault IAM role security policy approval delay",
+        "probability": "High",
+        "impact": "High",
+        "mitigation": "Scheduled review session with Security Committee lead Monday 10:00 AM",
+        "owner": "David Chen",
+        "type": "AI Observation"
+      }
+    ],
+    "blockersAndDependencies": [
+      {
+        "description": "Cross-account IAM role trust policy awaiting Security Architect approval",
+        "owner": "David Chen",
+        "severity": "High",
+        "impact": "Prevents automated secrets injection into EKS worker pods"
+      }
+    ],
+    "keyDecisions": [
+      {
+        "decision": "Selected Karpenter over Cluster Autoscaler for 40% faster pod provisioning during peak traffic spikes",
+        "stakeholder": "David Chen & Architecture Review Board",
+        "date": "Nov 04"
+      },
+      {
+        "decision": "Scheduled DMS tuning maintenance window for Sunday 2:00 AM UTC",
+        "stakeholder": "Sanjay Gupta",
+        "date": "Nov 05"
+      }
+    ],
+    "pendingActionItems": [
+      {
+        "action": "Submit updated IAM policy document to InfoSec compliance portal",
+        "owner": "David Chen",
+        "priority": "High",
+        "dueDate": "Monday Nov 09, 10:00 AM"
+      },
+      {
+        "action": "Review DMS replication metrics with AWS Enterprise Support TAM",
+        "owner": "Sanjay Gupta",
+        "priority": "High",
+        "dueDate": "Tuesday Nov 10"
+      }
+    ],
+    "additionalComments": "Overall infrastructure readiness is at 78%. Team remains on track for the Nov 21 production cutover target provided IAM blocker is resolved Monday.",
+    "confirmedFactsCount": 9,
+    "aiObservationsCount": 3,
+    "missingInformation": [],
+    "clarificationNeeded": false,
+    "createdAt": "2026-11-06T19:00:00.000Z",
+    "updatedAt": "2026-11-06T19:00:00.000Z"
+  }
+]

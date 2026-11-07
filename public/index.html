@@ -1,0 +1,894 @@
+<!DOCTYPE html>
+<html lang="en" data-theme="dark">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>AI Status Reporting Agent | Executive DSR & WSR Intelligence</title>
+  <meta name="description" content="AI-Powered Daily & Weekly Status Reporting Agent with multi-format Excel & transcript ingestion, automated reminders, and executive dashboards.">
+  <link rel="stylesheet" href="css/design-system.css">
+  <link rel="stylesheet" href="css/style.css">
+</head>
+<body>
+
+  <!-- Top In-App Reminder Alert Banner (Triggered dynamically) -->
+  <div id="active-reminder-banner" class="reminder-banner" style="display: none;">
+    <div class="reminder-banner-content">
+      <div class="reminder-banner-icon">
+        <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M18 8A6 6 0 0 0 6 8c0 7-3 9-3 9h18s-3-2-3-9"/><path d="M13.73 21a2 2 0 0 1-3.46 0"/></svg>
+      </div>
+      <div class="reminder-banner-text">
+        <h4 id="banner-alert-title">Daily Status Report Reminder (4:00 PM)</h4>
+        <p id="banner-alert-msg">Reminder: Please submit your Daily Status Report (DSR) with today's accomplishments, ongoing activities, blockers, and next steps.</p>
+      </div>
+    </div>
+    <div class="reminder-banner-actions">
+      <button class="btn btn-sm btn-primary" id="banner-btn-submit">
+        Submit Report Now
+      </button>
+      <button class="btn btn-sm btn-outline" id="banner-btn-dismiss">
+        Dismiss
+      </button>
+    </div>
+  </div>
+
+  <!-- Main Navigation Header -->
+  <header class="app-header">
+    <div class="brand-wrapper">
+      <div class="brand-logo-icon">
+        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round">
+          <polygon points="12 2 2 7 12 12 22 7 12 2"/>
+          <polyline points="2 17 12 22 22 17"/>
+          <polyline points="2 12 12 17 22 12"/>
+        </svg>
+      </div>
+      <div class="brand-title">
+        StatusAI
+        <span class="brand-badge">Agent v1.0</span>
+      </div>
+    </div>
+
+    <nav class="header-nav">
+      <a class="nav-link active" data-tab="dashboard">
+        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><rect x="3" y="3" width="7" height="7"/><rect x="14" y="3" width="7" height="7"/><rect x="14" y="14" width="7" height="7"/><rect x="3" y="14" width="7" height="7"/></svg>
+        Dashboard
+      </a>
+      <a class="nav-link" data-tab="generator">
+        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><polygon points="13 2 3 14 12 14 11 22 21 10 12 10 13 2"/></svg>
+        Report Studio
+      </a>
+      <a class="nav-link" data-tab="reminders">
+        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="12" cy="12" r="10"/><polyline points="12 6 12 12 16 14"/></svg>
+        Reminders & Schedule
+      </a>
+      <a class="nav-link" data-tab="archive">
+        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M22 19a2 2 0 0 1-2 2H4a2 2 0 0 1-2-2V5a2 2 0 0 1 2-2h5l2 3h9a2 2 0 0 1 2 2z"/></svg>
+        Report Archive
+      </a>
+      <a class="nav-link" data-tab="comparison">
+        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M16 3h5v5"/><path d="M4 20L21 3"/><path d="M21 16v5h-5"/><path d="M15 15l6 6"/><path d="M4 4l5 5"/></svg>
+        Historical Comparison
+      </a>
+    </nav>
+
+    <div class="header-actions">
+      <button class="btn-icon" id="btn-header-bell" title="Pending Reminders">
+        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M18 8A6 6 0 0 0 6 8c0 7-3 9-3 9h18s-3-2-3-9"/><path d="M13.73 21a2 2 0 0 1-3.46 0"/></svg>
+        <span class="notification-count" id="header-reminder-badge" style="display: none;">0</span>
+      </button>
+      <button class="btn-icon" id="btn-theme-toggle" title="Toggle Theme">
+        <!-- SVG set by JS -->
+      </button>
+      <button class="btn-icon" id="btn-open-settings" title="Agent Settings & Gemini API">
+        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="12" cy="12" r="3"/><path d="M19.4 15a1.65 1.65 0 0 0 .33 1.82l.06.06a2 2 0 0 1 0 2.83 2 2 0 0 1-2.83 0l-.06-.06a1.65 1.65 0 0 0-1.82-.33 1.65 1.65 0 0 0-1 1.51V21a2 2 0 0 1-2 2 2 2 0 0 1-2-2v-.09A1.65 1.65 0 0 0 9 19.4a1.65 1.65 0 0 0-1.82.33l-.06.06a2 2 0 0 1-2.83 0 2 2 0 0 1 0-2.83l.06-.06a1.65 1.65 0 0 0 .33-1.82 1.65 1.65 0 0 0-1.51-1H3a2 2 0 0 1-2-2 2 2 0 0 1 2-2h.09A1.65 1.65 0 0 0 4.6 9a1.65 1.65 0 0 0-.33-1.82l-.06-.06a2 2 0 0 1 0-2.83 2 2 0 0 1 2.83 0l.06.06a1.65 1.65 0 0 0 1.82.33H9a1.65 1.65 0 0 0 1-1.51V3a2 2 0 0 1 2-2 2 2 0 0 1 2 2v.09a1.65 1.65 0 0 0 1 1.51 1.65 1.65 0 0 0 1.82-.33l.06-.06a2 2 0 0 1 2.83 0 2 2 0 0 1 0 2.83l-.06.06a1.65 1.65 0 0 0-.33 1.82V9a1.65 1.65 0 0 0 1.51 1H21a2 2 0 0 1 2 2 2 2 0 0 1-2 2h-.09a1.65 1.65 0 0 0-1.51 1z"/></svg>
+      </button>
+    </div>
+  </header>
+
+  <!-- Main Application Body -->
+  <main class="app-container">
+
+    <!-- ====================================================================
+         TAB 1: EXECUTIVE DASHBOARD
+         ==================================================================== -->
+    <section id="tab-dashboard" class="tab-pane active">
+      <div class="section-header">
+        <div>
+          <h2>Executive Status Overview</h2>
+          <p>Real-time delivery health, active blocker alerts, and automated submission reminders.</p>
+        </div>
+        <div style="display: flex; gap: 0.5rem;">
+          <button class="btn btn-outline" id="dash-btn-test-reminder">
+            <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M18 8A6 6 0 0 0 6 8c0 7-3 9-3 9h18s-3-2-3-9"/><path d="M13.73 21a2 2 0 0 1-3.46 0"/></svg>
+            Trigger Test Reminder
+          </button>
+          <button class="btn btn-primary" id="dash-btn-new-dsr">
+            + New Daily Report (DSR)
+          </button>
+        </div>
+      </div>
+
+      <!-- Live Scheduled Reminder Countdown Banner -->
+      <div class="reminder-countdown-card">
+        <div style="display: flex; align-items: center; gap: 0.75rem;">
+          <div style="width: 38px; height: 38px; border-radius: var(--radius-md); background: rgba(99, 102, 241, 0.2); color: var(--primary-400); display: flex; align-items: center; justify-content: center;">
+            <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="12" cy="12" r="10"/><polyline points="12 6 12 12 16 14"/></svg>
+          </div>
+          <div>
+            <h4 style="font-size: 0.95rem; font-weight: 700;">Automated Reminder Cadence</h4>
+            <p style="font-size: 0.8rem; color: var(--text-muted); margin: 0;">Daily DSR at 4:00 PM • Weekly WSR on Friday at 3:00 PM</p>
+          </div>
+        </div>
+        <div class="countdown-badges">
+          <div class="countdown-item">
+            <span style="font-size: 0.8rem; color: var(--text-secondary);">Next Daily Reminder:</span>
+            <span class="countdown-val" id="dash-next-daily-val">--:--:--</span>
+          </div>
+          <div class="countdown-item">
+            <span style="font-size: 0.8rem; color: var(--text-secondary);">Next Weekly Reminder:</span>
+            <span class="countdown-val" id="dash-next-weekly-val">--:--:--</span>
+          </div>
+        </div>
+      </div>
+
+      <!-- KPI Cards Grid -->
+      <div class="kpi-grid">
+        <div class="glass-panel kpi-card">
+          <div class="kpi-top">
+            <span class="kpi-title">Archived Reports</span>
+            <div class="kpi-icon-wrap">
+              <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8z"/><polyline points="14 2 14 8 20 8"/></svg>
+            </div>
+          </div>
+          <div class="kpi-value" id="kpi-total-reports">0</div>
+          <div class="kpi-subtext">DSR daily logs & WSR summaries</div>
+        </div>
+
+        <div class="kpi-card glass-panel">
+          <div class="kpi-top">
+            <span class="kpi-title">Active Blockers</span>
+            <div class="kpi-icon-wrap" style="color: var(--health-red);">
+              <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="12" cy="12" r="10"/><line x1="4.93" y1="4.93" x2="19.07" y2="19.07"/></svg>
+            </div>
+          </div>
+          <div class="kpi-value" id="kpi-active-blockers">0</div>
+          <div class="kpi-subtext">Immediate impediments flagged</div>
+        </div>
+
+        <div class="kpi-card glass-panel">
+          <div class="kpi-top">
+            <span class="kpi-title">Completed Items</span>
+            <div class="kpi-icon-wrap" style="color: var(--health-green);">
+              <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><polyline points="20 6 9 17 4 12"/></svg>
+            </div>
+          </div>
+          <div class="kpi-value" id="kpi-completed-tasks">0</div>
+          <div class="kpi-subtext">Verified sprint deliverables</div>
+        </div>
+
+        <div class="kpi-card glass-panel">
+          <div class="kpi-top">
+            <span class="kpi-title">Project Health Ratio</span>
+            <div class="kpi-icon-wrap" style="color: var(--health-amber);">
+              <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M22 12h-4l-3 9L9 3l-3 9H2"/></svg>
+            </div>
+          </div>
+          <div class="health-progress-bar">
+            <div class="health-segment-green" id="bar-seg-green" style="width: 50%;"></div>
+            <div class="health-segment-amber" id="bar-seg-amber" style="width: 50%;"></div>
+            <div class="health-segment-red" id="bar-seg-red" style="width: 0%;"></div>
+          </div>
+          <div class="kpi-subtext" id="kpi-health-summary" style="margin-top: 0.85rem;">
+            Analyzing health distribution...
+          </div>
+        </div>
+      </div>
+
+      <!-- Action Banner -->
+      <div class="glass-panel action-banner">
+        <div class="action-banner-text">
+          <h3>Quick Studio Actions</h3>
+          <p>Generate reports instantly from uploaded Excel trackers, meeting transcripts, or demo datasets.</p>
+        </div>
+        <div class="action-banner-btns">
+          <button class="btn btn-outline" id="dash-btn-new-wsr">
+            + New Weekly Report (WSR)
+          </button>
+          <button class="btn btn-outline" id="dash-btn-compare">
+            🔄 Compare Historical Reports
+          </button>
+        </div>
+      </div>
+
+      <!-- Recent Reports Stream -->
+      <div class="glass-panel" style="padding: 1.5rem;">
+        <div style="display: flex; align-items: center; justify-content: space-between; margin-bottom: 1.25rem;">
+          <h3 style="font-size: 1.15rem; font-weight: 700;">Recent Project Reports</h3>
+          <span style="font-size: 0.8rem; color: var(--text-muted);">Consolidated across DSR & WSR workflows</span>
+        </div>
+        <div class="data-table-wrapper">
+          <table class="data-table">
+            <thead>
+              <tr>
+                <th>Type</th>
+                <th>Project Name</th>
+                <th>Reporting Period</th>
+                <th>Health Status</th>
+                <th>Blockers</th>
+                <th>Actions</th>
+              </tr>
+            </thead>
+            <tbody id="dash-recent-reports-tbody">
+              <!-- Rendered via JS -->
+            </tbody>
+          </table>
+        </div>
+      </div>
+    </section>
+
+    <!-- ====================================================================
+         TAB 2: REPORT GENERATOR STUDIO
+         ==================================================================== -->
+    <section id="tab-generator" class="tab-pane">
+      <div class="section-header">
+        <div>
+          <h2 id="generator-title">Daily Status Report (DSR/DRS) Generator</h2>
+          <p>Ingest multi-format trackers, transcripts, and notes to generate structured executive updates.</p>
+        </div>
+        <div class="type-selector-pill">
+          <button class="type-btn active" data-type="DSR">
+            Daily Status Report
+            <span class="sub">DSR / DRS</span>
+          </button>
+          <button class="type-btn" data-type="WSR">
+            Weekly Status Report
+            <span class="sub">WSR Summary</span>
+          </button>
+        </div>
+      </div>
+
+      <div class="generator-layout">
+        <!-- Sidebar Controls -->
+        <aside class="generator-sidebar">
+
+          <!-- 1-Click Interactive Demo Box -->
+          <div class="demo-seeds-box">
+            <h4>
+              <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M12 2v20M17 5H9.5a3.5 3.5 0 0 0 0 7h5a3.5 3.5 0 0 1 0 7H6"/></svg>
+              Quick Test Demo Datasets
+            </h4>
+            <div class="demo-btn-group">
+              <button class="btn-demo-pill" data-demo-key="mobile-app">
+                <div>
+                  <strong>Fintech Mobile App Sprint 4</strong>
+                  <div style="font-size: 0.72rem; color: var(--text-muted);">Excel Tracker + Standup Audio Transcript</div>
+                </div>
+                <span class="badge badge-amber">Amber</span>
+              </button>
+              <button class="btn-demo-pill" data-demo-key="cloud-migration">
+                <div>
+                  <strong>AWS Cloud Migration & Security</strong>
+                  <div style="font-size: 0.72rem; color: var(--text-muted);">CSV Infrastructure Tracker + DMS Latency</div>
+                </div>
+                <span class="badge badge-primary">WSR Demo</span>
+              </button>
+            </div>
+          </div>
+
+          <!-- Multi-Format Dropzone -->
+          <div class="glass-panel" style="padding: 1.25rem;">
+            <div class="form-label" style="display: flex; align-items: center; justify-content: space-between;">
+              <span>Input Sources Ingestion</span>
+              <span style="font-size: 0.75rem; color: var(--text-muted);">.xlsx, .xls, .csv, .txt, .docx</span>
+            </div>
+
+            <div class="dropzone" id="dropzone">
+              <div class="dropzone-icon">
+                <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4"/><polyline points="17 8 12 3 7 8"/><line x1="12" y1="3" x2="12" y2="15"/></svg>
+              </div>
+              <div>
+                <h4>Drag & Drop Files Here</h4>
+                <p>Upload Excel task trackers or meeting transcripts</p>
+              </div>
+              <input type="file" id="file-upload-input" multiple accept=".xlsx,.xls,.csv,.txt,.docx,.doc,.md" style="display: none;" />
+            </div>
+
+            <!-- Ingested Files Preview Badges -->
+            <div class="parsed-files-list" id="parsed-files-container">
+              <!-- Populated dynamically -->
+            </div>
+          </div>
+
+          <!-- Project Metadata & Custom Notes Form -->
+          <div class="glass-panel" style="padding: 1.25rem;">
+            <div class="form-group">
+              <label class="form-label" for="input-project-name">Project / Initiative Name</label>
+              <input type="text" id="input-project-name" class="form-control" placeholder="e.g., Enterprise Payment Gateway 3.0" />
+            </div>
+
+            <div class="form-group" style="margin-bottom: 0.5rem;">
+              <label class="form-label" for="input-user-notes">Summary Notes & Specific Instructions</label>
+              <textarea id="input-user-notes" class="form-control" placeholder="Enter daily standup highlights, specific blockers to emphasize, or executive callouts..."></textarea>
+            </div>
+          </div>
+
+          <!-- Action Buttons -->
+          <div style="display: flex; gap: 0.75rem;">
+            <button class="btn btn-primary" id="btn-generate-report" style="flex: 1;">
+              <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><polygon points="13 2 3 14 12 14 11 22 21 10 12 10 13 2"/></svg>
+              Generate Report with AI
+            </button>
+            <button class="btn btn-outline" id="btn-reset-generator" title="Clear inputs">
+              Reset
+            </button>
+          </div>
+        </aside>
+
+        <!-- Right Column: Live Report Canvas -->
+        <main class="generator-main">
+
+          <!-- Clarification Alert Box (Shown when AI detects missing critical information) -->
+          <div id="report-clarification-container"></div>
+
+          <!-- Empty Canvas State -->
+          <div id="empty-report-state" class="glass-panel" style="padding: 4rem 2rem; text-align: center;">
+            <div style="width: 64px; height: 64px; border-radius: 50%; background: rgba(99, 102, 241, 0.1); color: var(--primary-400); display: flex; align-items: center; justify-content: center; margin: 0 auto 1.5rem auto;">
+              <svg width="32" height="32" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8z"/><polyline points="14 2 14 8 20 8"/><line x1="16" y1="13" x2="8" y2="13"/><line x1="16" y1="17" x2="8" y2="17"/><polyline points="10 9 9 9 8 9"/></svg>
+            </div>
+            <h3 style="font-size: 1.25rem; font-weight: 700; margin-bottom: 0.5rem;">Ready to Synthesize Status Report</h3>
+            <p style="max-width: 500px; margin: 0 auto 1.5rem auto;">
+              Upload an Excel project tracker, paste a meeting transcript, or click one of the <strong>Quick Test Demo Datasets</strong> on the left to see the AI agent in action!
+            </p>
+          </div>
+
+          <!-- Active Rendered Report Canvas -->
+          <div id="active-report-state" class="report-canvas" style="display: none;">
+            
+            <!-- Canvas Toolbar -->
+            <div class="report-canvas-toolbar">
+              <div class="report-meta-chips">
+                <span class="badge badge-primary" id="rep-type-badge">Daily Status Report</span>
+                <span class="badge badge-confirmed" id="rep-date-chip">Date Not Set</span>
+              </div>
+              <div class="report-action-buttons">
+                <button class="btn btn-sm btn-outline" id="btn-copy-md" title="Copy Markdown">
+                  📋 Markdown
+                </button>
+                <button class="btn btn-sm btn-outline" id="btn-copy-slack" title="Copy Slack formatted text">
+                  💬 Slack / Teams
+                </button>
+                <button class="btn btn-sm btn-outline" id="btn-email-preview" title="Preview Clean HTML Email">
+                  ✉️ Email
+                </button>
+                <button class="btn btn-sm btn-outline" id="btn-print-pdf" title="Print or Save as PDF">
+                  🖨️ PDF
+                </button>
+                <button class="btn btn-sm btn-outline" id="btn-download-json" title="Download JSON">
+                  { } JSON
+                </button>
+                <button class="btn btn-sm btn-success" id="btn-save-report">
+                  💾 Save to Archive
+                </button>
+              </div>
+            </div>
+
+            <!-- Report Header -->
+            <div class="report-doc-header">
+              <div class="report-doc-title">
+                <h1 id="rep-title">Project Name</h1>
+                <div class="report-doc-subtitle">
+                  <span>Executive Status Brief</span>
+                  <span>•</span>
+                  <span>Verified Multi-Source Ingestion</span>
+                </div>
+              </div>
+              <div class="health-banner-large" id="rep-health-container">
+                <!-- Rendered dynamically -->
+              </div>
+            </div>
+
+            <!-- Executive Summary -->
+            <div class="exec-summary-box">
+              <h3>Executive Summary</h3>
+              <p id="rep-exec-summary">Report summary text...</p>
+            </div>
+
+            <!-- Management Attention Required Alert Callout (WSR) -->
+            <div class="management-attention-box" id="rep-mgmt-attention-box" style="display: none;">
+              <div class="mgmt-icon">
+                <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M10.29 3.86L1.82 18a2 2 0 0 0 1.71 3h16.94a2 2 0 0 0 1.71-3L13.71 3.86a2 2 0 0 0-3.42 0z"/><line x1="12" y1="9" x2="12" y2="13"/><line x1="12" y1="17" x2="12.01" y2="17"/></svg>
+              </div>
+              <div class="mgmt-text">
+                <h4>Management Attention Required</h4>
+                <p id="rep-mgmt-text">Escalation description...</p>
+              </div>
+            </div>
+
+            <!-- Section 1: Work Completed / Key Accomplishments -->
+            <div class="report-section-block">
+              <div class="report-section-title">
+                <span id="rep-completed-title">Work Completed Today</span>
+                <span class="section-tag badge-confirmed">Confirmed In Source</span>
+              </div>
+              <div class="data-table-wrapper">
+                <table class="data-table">
+                  <thead>
+                    <tr>
+                      <th style="width: 55%;">Deliverable / Task</th>
+                      <th style="width: 25%;">Owner</th>
+                      <th style="width: 20%;">Evidence Source</th>
+                    </tr>
+                  </thead>
+                  <tbody id="rep-completed-tbody"></tbody>
+                </table>
+              </div>
+            </div>
+
+            <!-- Section 2: Tasks in Progress -->
+            <div class="report-section-block">
+              <div class="report-section-title">
+                <span>Tasks Currently in Progress</span>
+                <span class="section-tag badge-primary">Active Velocity</span>
+              </div>
+              <div class="data-table-wrapper">
+                <table class="data-table">
+                  <thead>
+                    <tr>
+                      <th style="width: 50%;">Workstream / Story</th>
+                      <th style="width: 20%;">Assignee</th>
+                      <th style="width: 15%;">Status</th>
+                      <th style="width: 15%;">Target Delivery</th>
+                    </tr>
+                  </thead>
+                  <tbody id="rep-inprogress-tbody"></tbody>
+                </table>
+              </div>
+            </div>
+
+            <!-- Section 3: Upcoming Activities / Next Steps -->
+            <div class="report-section-block">
+              <div class="report-section-title">
+                <span id="rep-upcoming-title">Upcoming Activities / Next Steps</span>
+                <span class="section-tag badge-primary">Next Cycle</span>
+              </div>
+              <div class="data-table-wrapper">
+                <table class="data-table">
+                  <thead>
+                    <tr>
+                      <th style="width: 50%;">Planned Priority</th>
+                      <th style="width: 20%;">Owner</th>
+                      <th style="width: 15%;">Priority</th>
+                      <th style="width: 15%;">Target Date</th>
+                    </tr>
+                  </thead>
+                  <tbody id="rep-upcoming-tbody"></tbody>
+                </table>
+              </div>
+            </div>
+
+            <!-- Section 4: Blockers & Dependencies + Risks 2-Col Grid -->
+            <div class="report-grid-2col">
+              <div class="report-section-block">
+                <div class="report-section-title">
+                  <span>Blockers & Dependencies</span>
+                  <span class="section-tag badge-red">Critical Path</span>
+                </div>
+                <div id="rep-blockers-container"></div>
+              </div>
+
+              <div class="report-section-block">
+                <div class="report-section-title">
+                  <span>Risks & Issues Heatmap</span>
+                  <span class="section-tag badge-observation">AI Analysis</span>
+                </div>
+                <div id="rep-risks-container"></div>
+              </div>
+            </div>
+
+            <!-- Section 5: Key Decisions & Action Items 2-Col Grid -->
+            <div class="report-grid-2col">
+              <div class="report-section-block">
+                <div class="report-section-title">
+                  <span>Key Decisions Logged</span>
+                </div>
+                <ul id="rep-decisions-container" style="padding-left: 1.25rem;"></ul>
+              </div>
+
+              <div class="report-section-block">
+                <div class="report-section-title">
+                  <span>Action Items & Ownership</span>
+                </div>
+                <div class="data-table-wrapper">
+                  <table class="data-table">
+                    <thead>
+                      <tr>
+                        <th>Action Item</th>
+                        <th>Owner</th>
+                        <th>Priority</th>
+                        <th>Status</th>
+                      </tr>
+                    </thead>
+                    <tbody id="rep-actions-tbody"></tbody>
+                  </table>
+                </div>
+              </div>
+            </div>
+
+            <!-- Section 6: Additional Comments -->
+            <div class="report-section-block" style="margin-bottom: 0;">
+              <div class="report-section-title">
+                <span>Additional Comments & Context Retention</span>
+              </div>
+              <p id="rep-additional-comments" style="font-size: 0.9rem; color: var(--text-secondary);"></p>
+            </div>
+
+          </div>
+        </main>
+      </div>
+    </section>
+
+    <!-- ====================================================================
+         TAB 3: AUTOMATED REMINDERS CONTROL CENTER
+         ==================================================================== -->
+    <section id="tab-reminders" class="tab-pane">
+      <div class="section-header">
+        <div>
+          <h2>Automated Reminder System</h2>
+          <p>Configure automated DSR and WSR submission prompts, timezones, and delivery audit history.</p>
+        </div>
+        <button class="btn btn-primary" id="btn-save-reminders-config">
+          💾 Save Schedule Configuration
+        </button>
+      </div>
+
+      <!-- Reminder Schedule Cards Grid -->
+      <div class="reminders-config-grid">
+
+        <!-- Card 1: Daily Reminder (DSR) -->
+        <div class="glass-panel reminder-card">
+          <div>
+            <div class="reminder-card-header">
+              <div class="reminder-card-title">
+                <div class="reminder-icon-box daily">
+                  <svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="12" cy="12" r="10"/><polyline points="12 6 12 12 16 14"/></svg>
+                </div>
+                <div>
+                  <h3 style="font-size: 1.1rem; font-weight: 700;">Daily Status Report (DSR)</h3>
+                  <p style="font-size: 0.8rem; color: var(--text-muted); margin: 0;">Daily cadence reminder prompt</p>
+                </div>
+              </div>
+              <label class="switch">
+                <input type="checkbox" id="toggle-daily-enabled" checked>
+                <span class="slider"></span>
+              </label>
+            </div>
+
+            <div class="reminder-schedule-details" style="margin-top: 1.25rem;">
+              <div class="schedule-row">
+                <span style="color: var(--text-secondary);">Frequency:</span>
+                <strong>Every Day</strong>
+              </div>
+              <div class="schedule-row">
+                <span style="color: var(--text-secondary);">Scheduled Time:</span>
+                <input type="time" id="input-daily-time" class="form-control" style="width: 130px; padding: 0.35rem 0.6rem;" value="16:00" />
+              </div>
+              <div class="schedule-row" style="flex-direction: column; align-items: flex-start; gap: 0.3rem;">
+                <span style="color: var(--text-secondary);">Prompt Message:</span>
+                <textarea id="input-daily-message" class="form-control" style="min-height: 60px; font-size: 0.825rem;">Reminder: Please submit your Daily Status Report (DSR) with today's accomplishments, ongoing activities, blockers, and next steps.</textarea>
+              </div>
+            </div>
+          </div>
+
+          <div style="display: flex; gap: 0.5rem; justify-content: flex-end;">
+            <button class="btn btn-sm btn-outline" id="btn-trigger-daily-test">
+              ⚡ Simulate & Trigger 4:00 PM Now
+            </button>
+          </div>
+        </div>
+
+        <!-- Card 2: Weekly Reminder (WSR) -->
+        <div class="glass-panel reminder-card">
+          <div>
+            <div class="reminder-card-header">
+              <div class="reminder-card-title">
+                <div class="reminder-icon-box weekly">
+                  <svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><rect x="3" y="4" width="18" height="18" rx="2" ry="2"/><line x1="16" y1="2" x2="16" y2="6"/><line x1="8" y1="2" x2="8" y2="6"/><line x1="3" y1="10" x2="21" y2="10"/></svg>
+                </div>
+                <div>
+                  <h3 style="font-size: 1.1rem; font-weight: 700;">Weekly Status Report (WSR)</h3>
+                  <p style="font-size: 0.8rem; color: var(--text-muted); margin: 0;">Weekly executive summary prompt</p>
+                </div>
+              </div>
+              <label class="switch">
+                <input type="checkbox" id="toggle-weekly-enabled" checked>
+                <span class="slider"></span>
+              </label>
+            </div>
+
+            <div class="reminder-schedule-details" style="margin-top: 1.25rem;">
+              <div class="schedule-row">
+                <span style="color: var(--text-secondary);">Frequency:</span>
+                <strong>Every Friday</strong>
+              </div>
+              <div class="schedule-row">
+                <span style="color: var(--text-secondary);">Scheduled Time:</span>
+                <input type="time" id="input-weekly-time" class="form-control" style="width: 130px; padding: 0.35rem 0.6rem;" value="15:00" />
+              </div>
+              <div class="schedule-row" style="flex-direction: column; align-items: flex-start; gap: 0.3rem;">
+                <span style="color: var(--text-secondary);">Prompt Message:</span>
+                <textarea id="input-weekly-message" class="form-control" style="min-height: 60px; font-size: 0.825rem;">Reminder: Please prepare and submit your Weekly Status Report (WSR) summarizing this week's accomplishments, progress, blockers, risks, and next week's priorities.</textarea>
+              </div>
+            </div>
+          </div>
+
+          <div style="display: flex; gap: 0.5rem; justify-content: flex-end;">
+            <button class="btn btn-sm btn-outline" id="btn-trigger-weekly-test">
+              ⚡ Simulate & Trigger Friday 3:00 PM Now
+            </button>
+          </div>
+        </div>
+
+      </div>
+
+      <!-- Timezone & Notification Channels Card -->
+      <div class="glass-panel" style="padding: 1.5rem; margin-bottom: 2rem;">
+        <h4 style="font-size: 1rem; font-weight: 700; margin-bottom: 1rem;">Notification Delivery & Timezone Settings</h4>
+        <div style="display: grid; grid-template-columns: repeat(auto-fit, minmax(280px, 1fr)); gap: 1.5rem;">
+          <div class="form-group" style="margin-bottom: 0;">
+            <label class="form-label" for="reminder-timezone">Configured Timezone</label>
+            <select id="reminder-timezone" class="form-control">
+              <option value="America/New_York">Eastern Time (US & Canada) - America/New_York</option>
+              <option value="America/Chicago">Central Time (US & Canada) - America/Chicago</option>
+              <option value="America/Denver">Mountain Time (US & Canada) - America/Denver</option>
+              <option value="America/Los_Angeles">Pacific Time (US & Canada) - America/Los_Angeles</option>
+              <option value="Europe/London">London / GMT - Europe/London</option>
+              <option value="Europe/Paris">Central European Time - Europe/Paris</option>
+              <option value="Asia/Kolkata">India Standard Time (IST) - Asia/Kolkata</option>
+              <option value="Asia/Singapore">Singapore Time (SGT) - Asia/Singapore</option>
+              <option value="Asia/Tokyo">Japan Standard Time (JST) - Asia/Tokyo</option>
+              <option value="UTC">Coordinated Universal Time (UTC)</option>
+            </select>
+          </div>
+
+          <div class="form-group" style="margin-bottom: 0;">
+            <label class="form-label" for="reminder-email">Recipient Notification Email</label>
+            <input type="email" id="reminder-email" class="form-control" value="team-lead@enterprise.com" />
+          </div>
+
+          <div class="form-group" style="margin-bottom: 0;">
+            <label class="form-label">Active Notification Channels</label>
+            <div style="display: flex; gap: 1.5rem; margin-top: 0.6rem;">
+              <label style="display: flex; align-items: center; gap: 0.4rem; font-size: 0.85rem; cursor: pointer;">
+                <input type="checkbox" id="channel-in-app" checked>
+                In-App Banners & Notification Bell
+              </label>
+              <label style="display: flex; align-items: center; gap: 0.4rem; font-size: 0.85rem; cursor: pointer;">
+                <input type="checkbox" id="channel-email" checked>
+                Email Dispatch
+              </label>
+            </div>
+          </div>
+        </div>
+      </div>
+
+      <!-- Delivery Audit Log History -->
+      <div class="glass-panel audit-log-section" style="padding: 1.5rem;">
+        <div style="display: flex; align-items: center; justify-content: space-between; margin-bottom: 1.25rem;">
+          <div>
+            <h3 style="font-size: 1.15rem; font-weight: 700;">Reminder Delivery History & Status Audit</h3>
+            <p style="font-size: 0.8rem; color: var(--text-muted); margin: 0;">Automated trigger timestamps, recipient acknowledgments, and deduplication verification.</p>
+          </div>
+        </div>
+        <div class="data-table-wrapper">
+          <table class="data-table">
+            <thead>
+              <tr>
+                <th>Delivered At</th>
+                <th>Type</th>
+                <th>Channel</th>
+                <th>Message Content</th>
+                <th>Delivery Status</th>
+                <th>Action</th>
+              </tr>
+            </thead>
+            <tbody id="reminder-history-tbody"></tbody>
+          </table>
+        </div>
+      </div>
+    </section>
+
+    <!-- ====================================================================
+         TAB 4: REPORT ARCHIVE & REPOSITORY
+         ==================================================================== -->
+    <section id="tab-archive" class="tab-pane">
+      <div class="section-header">
+        <div>
+          <h2>Report Repository & Archive</h2>
+          <p>Search, filter, export, and review all finalized DSR daily logs and WSR executive summaries.</p>
+        </div>
+      </div>
+
+      <!-- Filter Bar -->
+      <div class="glass-panel" style="padding: 1rem 1.25rem; margin-bottom: 1.5rem; display: flex; align-items: center; gap: 1rem; flex-wrap: wrap;">
+        <div style="flex: 1; min-width: 240px;">
+          <input type="text" id="archive-search-input" class="form-control" placeholder="Search by project name or executive summary..." />
+        </div>
+        <div style="width: 180px;">
+          <select id="archive-type-filter" class="form-control">
+            <option value="">All Report Types</option>
+            <option value="DSR">Daily Status Report (DSR)</option>
+            <option value="WSR">Weekly Status Report (WSR)</option>
+          </select>
+        </div>
+        <div style="width: 180px;">
+          <select id="archive-health-filter" class="form-control">
+            <option value="">All Health States</option>
+            <option value="green">Green (On Track)</option>
+            <option value="amber">Amber (Attention)</option>
+            <option value="red">Red (Critical Risk)</option>
+          </select>
+        </div>
+      </div>
+
+      <!-- Archive Table -->
+      <div class="glass-panel" style="padding: 1.5rem;">
+        <div class="data-table-wrapper">
+          <table class="data-table">
+            <thead>
+              <tr>
+                <th>Type</th>
+                <th>Project Name</th>
+                <th>Period</th>
+                <th>Health</th>
+                <th>Blockers</th>
+                <th>Actions</th>
+              </tr>
+            </thead>
+            <tbody id="archive-reports-tbody"></tbody>
+          </table>
+        </div>
+      </div>
+    </section>
+
+    <!-- ====================================================================
+         TAB 5: HISTORICAL COMPARISON
+         ==================================================================== -->
+    <section id="tab-comparison" class="tab-pane">
+      <div class="section-header">
+        <div>
+          <h2>Historical Report Comparison</h2>
+          <p>Analyze progress velocity, resolved vs emerging blockers, and health status transitions between two reports.</p>
+        </div>
+      </div>
+
+      <!-- Comparison Select Bar -->
+      <div class="glass-panel comparison-selection-bar">
+        <div>
+          <label class="form-label">Baseline Report (A)</label>
+          <select id="compare-select-a" class="form-control"></select>
+        </div>
+        <div style="font-size: 1.5rem; color: var(--primary-400); font-weight: 800; text-align: center;">
+          vs
+        </div>
+        <div>
+          <label class="form-label">Comparison Report (B)</label>
+          <select id="compare-select-b" class="form-control"></select>
+        </div>
+        <div>
+          <label class="form-label" style="visibility: hidden;">Action</label>
+          <button class="btn btn-primary" id="btn-run-comparison" style="width: 100%;">
+            Run Delta Analysis
+          </button>
+        </div>
+      </div>
+
+      <!-- Comparison Results -->
+      <div id="comparison-results-container" style="display: none;">
+        <!-- Delta KPI summary cards -->
+        <div class="delta-summary-grid">
+          <div class="delta-stat-card">
+            <div style="font-size: 0.8rem; text-transform: uppercase; color: var(--text-muted); margin-bottom: 0.4rem;">Health Transition</div>
+            <div id="comp-health-transition" style="display: flex; align-items: center; justify-content: center; gap: 0.5rem;"></div>
+          </div>
+          <div class="delta-stat-card">
+            <div style="font-size: 0.8rem; text-transform: uppercase; color: var(--text-muted); margin-bottom: 0.4rem;">Resolved Blockers</div>
+            <div style="font-size: 1.75rem; font-weight: 800; color: var(--health-green);" id="comp-resolved-blockers">0</div>
+          </div>
+          <div class="delta-stat-card">
+            <div style="font-size: 0.8rem; text-transform: uppercase; color: var(--text-muted); margin-bottom: 0.4rem;">New Blockers Identified</div>
+            <div style="font-size: 1.75rem; font-weight: 800; color: var(--health-red);" id="comp-new-blockers">0</div>
+          </div>
+          <div class="delta-stat-card">
+            <div style="font-size: 0.8rem; text-transform: uppercase; color: var(--text-muted); margin-bottom: 0.4rem;">Carry-Over Blockers</div>
+            <div style="font-size: 1.75rem; font-weight: 800; color: var(--health-amber);" id="comp-carryover-blockers">0</div>
+          </div>
+        </div>
+
+        <!-- Detailed Side-by-Side View -->
+        <div class="side-by-side-grid" id="comp-side-by-side"></div>
+      </div>
+    </section>
+
+  </main>
+
+  <!-- ====================================================================
+       MODALS & OVERLAYS
+       ==================================================================== -->
+
+  <!-- 1. Email Preview Modal -->
+  <div class="modal-overlay" id="email-preview-modal">
+    <div class="modal-dialog" style="max-width: 780px;">
+      <div class="modal-header">
+        <h3 style="font-size: 1.15rem; font-weight: 700;">HTML Email Notification Preview</h3>
+        <button class="btn-icon btn-modal-close" style="width: 30px; height: 30px;">&times;</button>
+      </div>
+      <div class="modal-body" id="email-modal-body">
+        <!-- Rendered by JS -->
+      </div>
+      <div class="modal-footer">
+        <button class="btn btn-secondary btn-modal-close">Close</button>
+        <button class="btn btn-primary" onclick="App.showToast('Email Sent', 'Report dispatched to recipient list.'); document.getElementById('email-preview-modal').classList.remove('active');">
+          Send Email Now
+        </button>
+      </div>
+    </div>
+  </div>
+
+  <!-- 2. Settings Modal -->
+  <div class="modal-overlay" id="settings-modal">
+    <div class="modal-dialog">
+      <div class="modal-header">
+        <h3 style="font-size: 1.15rem; font-weight: 700;">Agent Settings & AI Model Configuration</h3>
+        <button class="btn-icon btn-modal-close" style="width: 30px; height: 30px;">&times;</button>
+      </div>
+      <div class="modal-body">
+        <div class="form-group">
+          <label class="form-label" for="settings-gemini-key">Google Gemini API Key (Optional)</label>
+          <input type="password" id="settings-gemini-key" class="form-control" placeholder="AIzaSy..." />
+          <p style="font-size: 0.75rem; color: var(--text-muted); margin-top: 0.35rem;">
+            Leave blank to use the built-in offline NLP heuristics engine. If provided, the agent will query Gemini 2.0 Flash for multi-source analysis.
+          </p>
+        </div>
+        <div class="form-group" style="margin-bottom: 0;">
+          <label class="form-label">Offline Intelligence Engine</label>
+          <div style="padding: 0.75rem; background: var(--bg-surface-elevated); border-radius: var(--radius-md); font-size: 0.825rem; color: var(--text-secondary);">
+            ✓ Excel spreadsheet task & allocation parser<br>
+            ✓ Transcript speaker turn & action item extractor<br>
+            ✓ Automated Green/Amber/Red health scorer<br>
+            ✓ Missing information & follow-up clarifier
+          </div>
+        </div>
+      </div>
+      <div class="modal-footer">
+        <button class="btn btn-secondary btn-modal-close">Cancel</button>
+        <button class="btn btn-primary" id="btn-save-settings">Save Settings</button>
+      </div>
+    </div>
+  </div>
+
+  <!-- 3. Global Loading Overlay -->
+  <div class="modal-overlay" id="global-loader" style="z-index: 9999;">
+    <div style="display: flex; flex-direction: column; align-items: center; gap: 1rem; color: #fff;">
+      <div style="width: 44px; height: 44px; border: 3px solid rgba(255, 255, 255, 0.2); border-top-color: var(--primary-400); border-radius: 50%; animation: spin 0.8s linear infinite;"></div>
+      <div id="loader-text" style="font-size: 0.95rem; font-weight: 600;">Processing...</div>
+    </div>
+  </div>
+
+  <!-- Toast Notification Container -->
+  <div class="toast-container" id="toast-container"></div>
+
+  <style>
+    @keyframes spin {
+      to { transform: rotate(360deg); }
+    }
+  </style>
+
+  <!-- Application Scripts -->
+  <script src="js/api.js"></script>
+  <script src="js/export-utils.js"></script>
+  <script src="js/dashboard.js"></script>
+  <script src="js/generator.js"></script>
+  <script src="js/reminders.js"></script>
+  <script src="js/historical.js"></script>
+  <script src="js/app.js"></script>
+</body>
+</html>

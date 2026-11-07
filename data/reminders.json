@@ -1,0 +1,66 @@
+[
+  {
+    "id": "rem_1794084242089_91umqy",
+    "timestamp": "2026-11-07T20:44:02.089Z",
+    "type": "DSR",
+    "channel": "In-App Notification + Email (team-lead@enterprise.com)",
+    "recipient": "team-lead@enterprise.com",
+    "message": "Reminder: Please submit your Daily Status Report (DSR) with today's accomplishments, ongoing activities, blockers, and next steps.",
+    "status": "Acknowledged",
+    "dedupKey": "DSR_2026-11-07",
+    "meta": {
+      "source": "manual_test",
+      "scheduledTime": "16:00",
+      "timezone": "America/New_York"
+    },
+    "acknowledgedAt": "2026-11-07T21:06:52.890Z",
+    "notes": "Report ID: rep_dsr_fintech_01"
+  },
+  {
+    "id": "rem_hist_01",
+    "timestamp": "2026-11-06T16:00:00.000Z",
+    "type": "DSR",
+    "channel": "In-App Notification + Email (team-lead@enterprise.com)",
+    "recipient": "team-lead@enterprise.com",
+    "message": "Reminder: Please submit your Daily Status Report (DSR) with today's accomplishments, ongoing activities, blockers, and next steps.",
+    "status": "Report Submitted",
+    "dedupKey": "DSR_2026-11-06",
+    "notes": "Report ID: rep_dsr_fintech_01",
+    "meta": {
+      "source": "scheduled",
+      "scheduledTime": "16:00",
+      "timezone": "America/New_York"
+    }
+  },
+  {
+    "id": "rem_hist_02",
+    "timestamp": "2026-11-06T15:00:00.000Z",
+    "type": "WSR",
+    "channel": "In-App Notification + Email (team-lead@enterprise.com)",
+    "recipient": "team-lead@enterprise.com",
+    "message": "Reminder: Please prepare and submit your Weekly Status Report (WSR) summarizing this week's accomplishments, progress, blockers, risks, and next week's priorities.",
+    "status": "Report Submitted",
+    "dedupKey": "WSR_2026-W45",
+    "notes": "Report ID: rep_wsr_cloud_02",
+    "meta": {
+      "source": "scheduled",
+      "scheduledTime": "15:00",
+      "timezone": "America/New_York"
+    }
+  },
+  {
+    "id": "rem_hist_03",
+    "timestamp": "2026-11-05T16:00:00.000Z",
+    "type": "DSR",
+    "channel": "In-App Notification + Email (team-lead@enterprise.com)",
+    "recipient": "team-lead@enterprise.com",
+    "message": "Reminder: Please submit your Daily Status Report (DSR) with today's accomplishments, ongoing activities, blockers, and next steps.",
+    "status": "Acknowledged",
+    "dedupKey": "DSR_2026-11-05",
+    "meta": {
+      "source": "scheduled",
+      "scheduledTime": "16:00",
+      "timezone": "America/New_York"
+    }
+  }
+]

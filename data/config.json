@@ -1,0 +1,19 @@
+{
+  "timezone": "America/New_York",
+  "emailNotifications": true,
+  "inAppNotifications": true,
+  "notificationEmail": "team-lead@enterprise.com",
+  "daily": {
+    "enabled": true,
+    "time": "16:00",
+    "frequency": "Daily",
+    "message": "Reminder: Please submit your Daily Status Report (DSR) with today's accomplishments, ongoing activities, blockers, and next steps."
+  },
+  "weekly": {
+    "enabled": true,
+    "day": "Friday",
+    "time": "15:00",
+    "frequency": "Every Friday",
+    "message": "Reminder: Please prepare and submit your Weekly Status Report (WSR) summarizing this week's accomplishments, progress, blockers, risks, and next week's priorities."
+  }
+}
