@@ -99,6 +99,11 @@ const Generator = {
       this.openEmailModal();
     });
 
+    // Send report email from modal
+    document.getElementById('btn-dispatch-report-email')?.addEventListener('click', () => {
+      this.sendReportEmail();
+    });
+
     document.getElementById('btn-print-pdf')?.addEventListener('click', () => {
       ExportUtils.printPdf();
     });
@@ -576,27 +581,93 @@ const Generator = {
     const container = document.getElementById('email-modal-body');
     if (!modal || !container || !this.currentReport) return;
 
+    // Pre-populate email fields
+    const toInput = document.getElementById('email-to-input');
+    if (toInput) {
+      toInput.value = localStorage.getItem('last_report_email_to') || 'audhesh123@gmail.com';
+    }
+
+    const ccInput = document.getElementById('email-cc-input');
+    if (ccInput) {
+      ccInput.value = localStorage.getItem('last_report_email_cc') || '';
+    }
+
+    const fromInput = document.getElementById('email-from-input');
+    if (fromInput) {
+      fromInput.value = 'noreplyststus@company.com';
+    }
+
+    const subjectInput = document.getElementById('email-subject-input');
+    if (subjectInput) {
+      const repType = this.currentReport.reportType || 'DSR';
+      const health = this.currentReport.projectHealth?.status?.toUpperCase() || 'GREEN';
+      subjectInput.value = `[${repType}] ${this.currentReport.projectName} - Executive Status Update (${health})`;
+    }
+
+    // Render HTML preview
     const emailHtml = ExportUtils.toEmailHtml(this.currentReport);
-    container.innerHTML = `
-      <div class="email-header-meta">
-        <div class="email-subject">
-          [STATUS UPDATE] ${this.currentReport.projectName} - ${this.currentReport.reportType} (${this.currentReport.projectHealth?.status?.toUpperCase()})
-        </div>
-        <div class="email-meta-row">
-          <strong>To:</strong> executive-stakeholders@enterprise.com, project-team@enterprise.com
-        </div>
-        <div class="email-meta-row">
-          <strong>From:</strong> AI Status Reporting Agent &lt;reporting-agent@enterprise.ai&gt;
-        </div>
-        <div class="email-meta-row">
-          <strong>Date:</strong> ${new Date().toUTCString()}
-        </div>
-      </div>
-      <div class="email-preview-wrapper">
-        ${emailHtml}
-      </div>
-    `;
+    container.innerHTML = emailHtml;
 
     modal.classList.add('active');
+  },
+
+  async sendReportEmail() {
+    if (!this.currentReport) return;
+
+    const to = document.getElementById('email-to-input')?.value?.trim();
+    const cc = document.getElementById('email-cc-input')?.value?.trim();
+    const from = document.getElementById('email-from-input')?.value?.trim() || 'noreplyststus@company.com';
+    const subject = document.getElementById('email-subject-input')?.value?.trim();
+
+    if (!to) {
+      App.showToast('Recipient Missing', 'Please enter at least one recipient email address in the To field.', 'error');
+      document.getElementById('email-to-input')?.focus();
+      return;
+    }
+
+    // Persist To and CC for convenience next time
+    localStorage.setItem('last_report_email_to', to);
+    if (cc) localStorage.setItem('last_report_email_cc', cc);
+
+    const emailHtml = ExportUtils.toEmailHtml(this.currentReport);
+    App.showLoader(true, `Dispatching ${this.currentReport.reportType} from ${from} to ${to}...`);
+
+    try {
+      const res = await API.sendReportEmail({
+        to,
+        cc,
+        from,
+        subject,
+        html: emailHtml,
+        report: this.currentReport
+      });
+
+      if (res.success) {
+        document.getElementById('email-preview-modal')?.classList.remove('active');
+        if (res.result?.provider === 'simulated') {
+          App.showToast(
+            'Report Prepared (Simulated)',
+            `Report formatted from ${from} to ${to}${cc ? ' (CC: ' + cc + ')' : ''}. Set your Gmail App Password in Reminders to send live.`,
+            'info'
+          );
+        } else {
+          App.showToast(
+            'Report Dispatched!',
+            `Successfully sent executive status brief to ${to}${cc ? ' (CC: ' + cc + ')' : ''} from ${from}!`,
+            'success'
+          );
+        }
+
+        // Refresh delivery audit logs
+        Reminders.loadRemindersView();
+        Dashboard.loadDashboard();
+      } else {
+        App.showToast('Dispatch Error', res.error || 'Failed to dispatch email.', 'error');
+      }
+    } catch (err) {
+      App.showToast('Email Error', err.message, 'error');
+    } finally {
+      App.showLoader(false);
+    }
   }
 };

@@ -8,3 +8,9 @@ npm-debug.log*
 yarn-debug.log*
 yarn-error.log*
 
+# Ignore runtime data and credentials
+data/config.json
+data/reports.json
+data/reminders.json
+
+

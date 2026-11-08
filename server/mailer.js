@@ -210,6 +210,123 @@ class MailerService {
       note: 'To send live emails, enter your 16-character Gmail App Password and click Save Schedule Settings.'
     };
   }
+
+  /**
+   * Dispatches a generated report to To and CC recipients from noreplyststus@company.com
+   */
+  async sendReportEmail(options = {}) {
+    const config = storage.getRemindersConfig();
+    const {
+      to,
+      cc,
+      from = 'noreplyststus@company.com',
+      subject,
+      html,
+      text,
+      report
+    } = options;
+
+    if (!to || !to.trim()) {
+      return { success: false, error: 'Recipient address (To) is required.' };
+    }
+
+    // Split multiple recipients by comma or semicolon
+    const toRecipients = to.split(/[,;]+/).map(s => s.trim()).filter(Boolean);
+    const ccRecipients = cc ? cc.split(/[,;]+/).map(s => s.trim()).filter(Boolean) : [];
+
+    const senderHeader = `"PMO Status Engine" <${from}>`;
+
+    const emailUser = options.emailUser || process.env.EMAIL_USER || config.emailUser || config.notificationEmail || 'audhesh123@gmail.com';
+    let emailPass = (options.emailPass || process.env.EMAIL_PASS || config.emailPass || '').trim().replace(/\s+/g, '');
+
+    // Formspree dispatch if provider is formspree
+    const formspreeId = options.formspreeId || process.env.FORMSPREE_FORM_ID || config.formspreeFormId;
+    if (config.emailProvider === 'formspree' && formspreeId) {
+      try {
+        console.log(`[MailerService] Sending Report via Formspree to ${toRecipients.join(', ')} (CC: ${ccRecipients.join(', ')})...`);
+        const response = await fetch(`https://formspree.io/f/${formspreeId}`, {
+          method: 'POST',
+          headers: { 'Content-Type': 'application/json', 'Accept': 'application/json' },
+          body: JSON.stringify({
+            from: from,
+            to: toRecipients.join(', '),
+            cc: ccRecipients.join(', '),
+            subject: subject,
+            message: `Report dispatched from ${from} to ${toRecipients.join(', ')} (CC: ${ccRecipients.join(', ')})`,
+            html: html
+          })
+        });
+
+        if (response.ok) {
+          return { success: true, provider: 'formspree', to: toRecipients, cc: ccRecipients, from };
+        }
+      } catch (err) {
+        console.warn(`[MailerService] Formspree dispatch error: ${err.message}`);
+      }
+    }
+
+    // SMTP / Gmail dispatch
+    if (emailUser && emailPass) {
+      try {
+        console.log(`[MailerService] Dispatching Report from ${from} via SMTP (${emailUser}) to ${toRecipients.join(', ')} (CC: ${ccRecipients.join(', ')})...`);
+        
+        const transportConfig = emailUser.toLowerCase().includes('@gmail.com')
+          ? {
+              service: 'gmail',
+              auth: {
+                user: emailUser,
+                pass: emailPass
+              }
+            }
+          : {
+              host: config.smtpHost || 'smtp.gmail.com',
+              port: parseInt(config.smtpPort || 465, 10),
+              secure: config.smtpSecure !== false,
+              auth: {
+                user: emailUser,
+                pass: emailPass
+              }
+            };
+
+        const transporter = nodemailer.createTransport(transportConfig);
+
+        const mailOptions = {
+          from: senderHeader,
+          replyTo: from,
+          to: toRecipients,
+          subject: subject,
+          html: html,
+          text: text || `Attached is the latest Executive Status Report for ${report?.projectName || 'Project'}. View in browser for full interactive dashboard.`
+        };
+
+        if (ccRecipients.length > 0) {
+          mailOptions.cc = ccRecipients;
+        }
+
+        const info = await transporter.sendMail(mailOptions);
+        console.log(`[MailerService] Report successfully sent! Message ID: ${info.messageId}`);
+        return { success: true, provider: 'smtp', messageId: info.messageId, to: toRecipients, cc: ccRecipients, from };
+      } catch (err) {
+        console.error(`[MailerService] Report SMTP dispatch failed:`, err);
+        let userFriendlyError = err.message;
+        if (err.code === 'EAUTH' || err.message.includes('535') || err.message.includes('BadCredentials')) {
+          userFriendlyError = 'Gmail rejected authentication. Please ensure you generated a 16-character App Password at myaccount.google.com/apppasswords.';
+        }
+        return { success: false, provider: 'smtp', error: userFriendlyError };
+      }
+    }
+
+    // Fallback: Simulated dispatch
+    console.log(`[MailerService] [SIMULATED REPORT DISPATCH] From: ${from} | To: ${toRecipients.join(', ')} | CC: ${ccRecipients.join(', ')}`);
+    return {
+      success: true,
+      provider: 'simulated',
+      from,
+      to: toRecipients,
+      cc: ccRecipients,
+      note: 'Simulated dispatch. (To send live emails, configure your 16-character Gmail App Password in Reminders).'
+    };
+  }
 }
 
 module.exports = new MailerService();

@@ -91,6 +91,13 @@ const API = {
     });
   },
 
+  async sendReportEmail(payload) {
+    return this.request('/api/reports/send-email', {
+      method: 'POST',
+      body: JSON.stringify(payload)
+    });
+  },
+
   async deleteReport(id) {
     return this.request(`/api/reports/${id}`, {
       method: 'DELETE'

@@ -2,7 +2,7 @@
   "timezone": "America/New_York",
   "emailNotifications": true,
   "inAppNotifications": true,
-  "notificationEmail": "audhesh123@gmail.com",
+  "notificationEmail": "user@example.com",
   "emailProvider": "smtp",
   "formspreeFormId": "",
   "smtpHost": "smtp.gmail.com",

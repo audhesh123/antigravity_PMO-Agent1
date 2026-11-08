@@ -329,6 +329,58 @@ app.post('/api/reports', (req, res) => {
   }
 });
 
+// Dispatch generated status report via email with To and CC from noreplyststus@company.com
+app.post('/api/reports/send-email', async (req, res) => {
+  try {
+    const {
+      to,
+      cc,
+      from = 'noreplyststus@company.com',
+      subject,
+      html,
+      report
+    } = req.body;
+
+    if (!to || !to.trim()) {
+      return res.status(400).json({ error: 'Recipient address (To) is required.' });
+    }
+
+    const mailer = require('./mailer');
+    const result = await mailer.sendReportEmail({
+      to: to.trim(),
+      cc: (cc || '').trim(),
+      from: from || 'noreplyststus@company.com',
+      subject: subject || `[STATUS REPORT] ${report?.projectName || 'Project Update'}`,
+      html,
+      report
+    });
+
+    if (result.success === false) {
+      return res.status(400).json({ success: false, error: result.error });
+    }
+
+    // Log the report dispatch to delivery history
+    storage.logReminderEvent({
+      type: report?.reportType || 'DSR',
+      channel: `Direct Report Dispatch (From: ${from})`,
+      recipient: `To: ${to}${cc ? ' | CC: ' + cc : ''}`,
+      message: `Dispatched ${report?.reportType || 'Status'} Report for "${report?.projectName || 'Project'}" to team stakeholders`,
+      status: 'Delivered',
+      meta: {
+        to,
+        cc,
+        from,
+        subject,
+        reportId: report?.id
+      }
+    });
+
+    res.json({ success: true, result });
+  } catch (err) {
+    res.status(500).json({ success: false, error: err.message });
+  }
+});
+
 app.delete('/api/reports/:id', (req, res) => {
   const success = storage.deleteReport(req.params.id);
   if (!success) return res.status(404).json({ error: 'Report not found or could not be deleted' });
