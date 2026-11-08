@@ -141,7 +141,15 @@ app.post('/api/ingest/sample', (req, res) => {
 // 4. Generate Daily Status Report (DSR)
 app.post('/api/generate-dsr', async (req, res) => {
   try {
-    const { excelData, transcriptData, userNotes, rawText, userAnswers = {}, apiKey = '' } = req.body;
+    let { excelData, transcriptData, userNotes, rawText, userAnswers = {}, apiKey = '' } = req.body;
+
+    // Automatically parse rawText or userNotes if transcriptData is not explicitly provided
+    if (!transcriptData && (rawText || userNotes)) {
+      const textToParse = (rawText || userNotes).trim();
+      if (textToParse) {
+        transcriptData = fileParser.parseTranscriptText(textToParse, 'input_transcript.txt');
+      }
+    }
 
     const previousReports = storage.getReports();
 
@@ -175,7 +183,15 @@ app.post('/api/generate-dsr', async (req, res) => {
 // 5. Generate Weekly Status Report (WSR)
 app.post('/api/generate-wsr', async (req, res) => {
   try {
-    const { excelData, transcriptData, userNotes, rawText, userAnswers = {}, apiKey = '' } = req.body;
+    let { excelData, transcriptData, userNotes, rawText, userAnswers = {}, apiKey = '' } = req.body;
+
+    // Automatically parse rawText or userNotes if transcriptData is not explicitly provided
+    if (!transcriptData && (rawText || userNotes)) {
+      const textToParse = (rawText || userNotes).trim();
+      if (textToParse) {
+        transcriptData = fileParser.parseTranscriptText(textToParse, 'input_transcript.txt');
+      }
+    }
 
     const previousReports = storage.getReports();
 
