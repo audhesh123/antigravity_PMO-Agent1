@@ -631,7 +631,21 @@
 
       <!-- Timezone & Notification Channels Card -->
       <div class="glass-panel" style="padding: 1.5rem; margin-bottom: 2rem;">
-        <h4 style="font-size: 1rem; font-weight: 700; margin-bottom: 1rem;">Notification Delivery & Timezone Settings</h4>
+        <div style="display: flex; align-items: center; justify-content: space-between; flex-wrap: wrap; gap: 1rem; margin-bottom: 1.25rem;">
+          <div>
+            <h4 style="font-size: 1.1rem; font-weight: 700; margin: 0 0 0.25rem 0;">Notification Delivery & Email Dispatch Settings</h4>
+            <p style="font-size: 0.825rem; color: var(--text-muted); margin: 0;">Configure automated daily dispatch to <strong>audhesh123@gmail.com</strong> via Gmail SMTP or Formspree.</p>
+          </div>
+          <div style="display: flex; gap: 0.75rem;">
+            <button class="btn btn-sm btn-outline" id="btn-send-test-email" style="display: inline-flex; align-items: center; gap: 0.4rem;">
+              ✉️ Send Test Email to audhesh123@gmail.com
+            </button>
+            <button class="btn btn-sm btn-primary" id="btn-save-reminders-config">
+              Save Schedule Settings
+            </button>
+          </div>
+        </div>
+
         <div style="display: grid; grid-template-columns: repeat(auto-fit, minmax(280px, 1fr)); gap: 1.5rem;">
           <div class="form-group" style="margin-bottom: 0;">
             <label class="form-label" for="reminder-timezone">Configured Timezone</label>
@@ -651,7 +665,35 @@
 
           <div class="form-group" style="margin-bottom: 0;">
             <label class="form-label" for="reminder-email">Recipient Notification Email</label>
-            <input type="email" id="reminder-email" class="form-control" value="team-lead@enterprise.com" />
+            <input type="email" id="reminder-email" class="form-control" value="audhesh123@gmail.com" />
+          </div>
+
+          <div class="form-group" style="margin-bottom: 0;">
+            <label class="form-label" for="reminder-provider">Email Delivery Integration</label>
+            <select id="reminder-provider" class="form-control">
+              <option value="smtp">Gmail SMTP / App Password (Recommended - Direct)</option>
+              <option value="formspree">Formspree Endpoint (REST API)</option>
+              <option value="simulated">In-App Preview & Delivery Audit Log Only</option>
+            </select>
+          </div>
+        </div>
+
+        <!-- Conditional Provider Configurations -->
+        <div style="display: grid; grid-template-columns: repeat(auto-fit, minmax(280px, 1fr)); gap: 1.5rem; margin-top: 1.25rem; padding-top: 1.25rem; border-top: 1px solid var(--border-color);">
+          <div class="form-group" id="group-smtp-pass" style="margin-bottom: 0;">
+            <label class="form-label" for="input-email-pass">Gmail App Password (16 characters)</label>
+            <input type="password" id="input-email-pass" class="form-control" placeholder="e.g., abcd efgh ijkl mnop" />
+            <small style="font-size: 0.75rem; color: var(--text-muted); display: block; margin-top: 4px;">
+              Generated from <a href="https://myaccount.google.com/apppasswords" target="_blank" style="color: var(--primary);">Google Account &rarr; Security &rarr; App Passwords</a>
+            </small>
+          </div>
+
+          <div class="form-group" id="group-formspree-id" style="margin-bottom: 0;">
+            <label class="form-label" for="input-formspree-id">Formspree Form ID</label>
+            <input type="text" id="input-formspree-id" class="form-control" placeholder="e.g., xpwzqkvo or full https://formspree.io/f/..." />
+            <small style="font-size: 0.75rem; color: var(--text-muted); display: block; margin-top: 4px;">
+              Get free endpoint from <a href="https://formspree.io" target="_blank" style="color: var(--primary);">Formspree.io</a> to route directly to audhesh123@gmail.com
+            </small>
           </div>
 
           <div class="form-group" style="margin-bottom: 0;">
@@ -659,11 +701,11 @@
             <div style="display: flex; gap: 1.5rem; margin-top: 0.6rem;">
               <label style="display: flex; align-items: center; gap: 0.4rem; font-size: 0.85rem; cursor: pointer;">
                 <input type="checkbox" id="channel-in-app" checked>
-                In-App Banners & Notification Bell
+                In-App Banners & Bell
               </label>
               <label style="display: flex; align-items: center; gap: 0.4rem; font-size: 0.85rem; cursor: pointer;">
                 <input type="checkbox" id="channel-email" checked>
-                Email Dispatch
+                Daily Email to audhesh123@gmail.com
               </label>
             </div>
           </div>

@@ -7,7 +7,15 @@
     "start": "node server/index.js",
     "dev": "node --watch server/index.js"
   },
-  "keywords": ["ai", "dsr", "wsr", "reporting", "status-report", "reminders", "executive-dashboard"],
+  "keywords": [
+    "ai",
+    "dsr",
+    "wsr",
+    "reporting",
+    "status-report",
+    "reminders",
+    "executive-dashboard"
+  ],
   "author": "Antigravity AI",
   "license": "MIT",
   "repository": {
@@ -19,6 +27,7 @@
     "express": "^4.21.2",
     "multer": "^1.4.5-lts.1",
     "node-cron": "^3.0.3",
+    "nodemailer": "^10.4.0",
     "xlsx": "^0.18.5"
   }
 }

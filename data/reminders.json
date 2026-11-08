@@ -1,7 +1,22 @@
 [
   {
-    "id": "rem_1794084242089_91umqy",
-    "timestamp": "2026-11-07T20:44:02.089Z",
+    "id": "rem_1794107842565_txsjnm",
+    "timestamp": "2026-11-08T03:17:22.565Z",
+    "type": "DSR",
+    "channel": "In-App Notification + Email (audhesh123@gmail.com)",
+    "recipient": "audhesh123@gmail.com",
+    "message": "Reminder: Please submit your Daily Status Report (DSR) with today's accomplishments, ongoing activities, blockers, and next steps.",
+    "status": "Delivered",
+    "dedupKey": "DSR_2026-11-07",
+    "meta": {
+      "source": "manual_test",
+      "scheduledTime": "16:00",
+      "timezone": "America/New_York"
+    }
+  },
+  {
+    "id": "rem_1794106467027_kibhmp",
+    "timestamp": "2026-11-08T02:54:27.027Z",
     "type": "DSR",
     "channel": "In-App Notification + Email (team-lead@enterprise.com)",
     "recipient": "team-lead@enterprise.com",
@@ -13,8 +28,40 @@
       "scheduledTime": "16:00",
       "timezone": "America/New_York"
     },
-    "acknowledgedAt": "2026-11-07T21:06:52.890Z",
-    "notes": "Report ID: rep_dsr_fintech_01"
+    "acknowledgedAt": "2026-11-08T02:54:40.410Z"
+  },
+  {
+    "id": "rem_1794106174348_us4b14",
+    "timestamp": "2026-11-08T02:49:34.348Z",
+    "type": "DSR",
+    "channel": "In-App Notification + Email (team-lead@enterprise.com)",
+    "recipient": "team-lead@enterprise.com",
+    "message": "Reminder: Please submit your Daily Status Report (DSR) with today's accomplishments, ongoing activities, blockers, and next steps.",
+    "status": "Acknowledged",
+    "dedupKey": "DSR_2026-11-07",
+    "meta": {
+      "source": "manual_test",
+      "scheduledTime": "16:00",
+      "timezone": "America/New_York"
+    },
+    "acknowledgedAt": "2026-11-08T02:54:42.108Z"
+  },
+  {
+    "id": "rem_1794084242089_91umqy",
+    "timestamp": "2026-11-07T20:44:02.089Z",
+    "type": "DSR",
+    "channel": "In-App Notification + Email (team-lead@enterprise.com)",
+    "recipient": "team-lead@enterprise.com",
+    "message": "Reminder: Please submit your Daily Status Report (DSR) with today's accomplishments, ongoing activities, blockers, and next steps.",
+    "status": "Report Submitted",
+    "dedupKey": "DSR_2026-11-07",
+    "meta": {
+      "source": "manual_test",
+      "scheduledTime": "16:00",
+      "timezone": "America/New_York"
+    },
+    "acknowledgedAt": "2026-11-08T02:47:39.915Z",
+    "notes": "Report ID: dsr_1794106020876"
   },
   {
     "id": "rem_hist_01",

@@ -1,5 +1,6 @@
 const cron = require('node-cron');
 const storage = require('./storage');
+const mailer = require('./mailer');
 
 class ReminderService {
   constructor() {
@@ -121,6 +122,18 @@ class ReminderService {
     if (this.activeInAppAlerts.length > 10) this.activeInAppAlerts.length = 10;
 
     console.log(`[ReminderService] Triggered DSR Reminder (${source}) -> ${channels.join(', ')}`);
+
+    // Dispatch email if notifications enabled
+    if (config.emailNotifications) {
+      mailer.sendReminderEmail({
+        to: config.notificationEmail || 'audhesh123@gmail.com',
+        type: 'DSR',
+        message: message,
+        scheduledTime: config.daily?.time || '16:00',
+        timezone: config.timezone
+      }).catch(err => console.error('[ReminderService] DSR email error:', err.message));
+    }
+
     return { success: true, logEntry, alertItem };
   }
 
@@ -168,6 +181,18 @@ class ReminderService {
     if (this.activeInAppAlerts.length > 10) this.activeInAppAlerts.length = 10;
 
     console.log(`[ReminderService] Triggered WSR Reminder (${source}) -> ${channels.join(', ')}`);
+
+    // Dispatch email if notifications enabled
+    if (config.emailNotifications) {
+      mailer.sendReminderEmail({
+        to: config.notificationEmail || 'audhesh123@gmail.com',
+        type: 'WSR',
+        message: message,
+        scheduledTime: config.weekly?.time || '15:00',
+        timezone: config.timezone
+      }).catch(err => console.error('[ReminderService] WSR email error:', err.message));
+    }
+
     return { success: true, logEntry, alertItem };
   }
 

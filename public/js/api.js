@@ -135,6 +135,13 @@ const API = {
     });
   },
 
+  async sendEmailTest(to = 'audhesh123@gmail.com', type = 'DSR') {
+    return this.request('/api/reminders/send-email-test', {
+      method: 'POST',
+      body: JSON.stringify({ to, type })
+    });
+  },
+
   async getNextReminders() {
     return this.request('/api/reminders/next');
   }

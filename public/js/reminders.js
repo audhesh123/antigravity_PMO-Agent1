@@ -26,10 +26,51 @@ const Reminders = {
       await this.triggerTest('WSR');
     });
 
+    // Send direct test email button
+    document.getElementById('btn-send-test-email')?.addEventListener('click', async () => {
+      await this.sendTestEmail();
+    });
+
+    // Provider select change
+    const providerSelect = document.getElementById('reminder-provider');
+    if (providerSelect) {
+      providerSelect.addEventListener('change', () => this.updateProviderVisibility());
+    }
+
     // Timezone change
     document.getElementById('reminder-timezone')?.addEventListener('change', () => {
       this.saveConfig();
     });
+  },
+
+  updateProviderVisibility() {
+    const val = document.getElementById('reminder-provider')?.value || 'smtp';
+    const smtpGroup = document.getElementById('group-smtp-pass');
+    const formspreeGroup = document.getElementById('group-formspree-id');
+
+    if (smtpGroup) smtpGroup.style.display = val === 'smtp' ? 'block' : 'none';
+    if (formspreeGroup) formspreeGroup.style.display = val === 'formspree' ? 'block' : 'none';
+  },
+
+  async sendTestEmail() {
+    const email = document.getElementById('reminder-email')?.value?.trim() || 'audhesh123@gmail.com';
+    App.showLoader(true, `Dispatching test reminder email to ${email}...`);
+
+    try {
+      const res = await API.sendEmailTest(email, 'DSR');
+      if (res.success) {
+        if (res.result?.provider === 'simulated') {
+          App.showToast('Email Preview Generated', `Prepared reminder for ${email}. (Set Gmail App Password or Formspree ID to send live).`, 'info');
+        } else {
+          App.showToast('Email Sent!', `Successfully dispatched DSR reminder to ${email} via ${res.result?.provider || 'mail'}!`);
+        }
+        await this.loadRemindersView();
+      }
+    } catch (err) {
+      App.showToast('Email Error', err.message, 'error');
+    } finally {
+      App.showLoader(false);
+    }
   },
 
   async loadRemindersView() {
@@ -81,19 +122,34 @@ const Reminders = {
     if (tzSelect && cfg.timezone) tzSelect.value = cfg.timezone;
 
     const emailInp = document.getElementById('reminder-email');
-    if (emailInp) emailInp.value = cfg.notificationEmail || '';
+    if (emailInp) emailInp.value = cfg.notificationEmail || 'audhesh123@gmail.com';
+
+    const provSelect = document.getElementById('reminder-provider');
+    if (provSelect && cfg.emailProvider) provSelect.value = cfg.emailProvider;
+
+    const formspreeInp = document.getElementById('input-formspree-id');
+    if (formspreeInp) formspreeInp.value = cfg.formspreeFormId || '';
+
+    const passInp = document.getElementById('input-email-pass');
+    if (passInp) passInp.value = cfg.emailPass || '';
 
     const chInApp = document.getElementById('channel-in-app');
     if (chInApp) chInApp.checked = !!cfg.inAppNotifications;
 
     const chEmail = document.getElementById('channel-email');
     if (chEmail) chEmail.checked = !!cfg.emailNotifications;
+
+    this.updateProviderVisibility();
   },
 
   async saveConfig() {
     const updated = {
       timezone: document.getElementById('reminder-timezone')?.value || 'America/New_York',
-      notificationEmail: document.getElementById('reminder-email')?.value || 'team-lead@enterprise.com',
+      notificationEmail: document.getElementById('reminder-email')?.value || 'audhesh123@gmail.com',
+      emailProvider: document.getElementById('reminder-provider')?.value || 'smtp',
+      formspreeFormId: document.getElementById('input-formspree-id')?.value?.trim() || '',
+      emailPass: document.getElementById('input-email-pass')?.value?.trim() || '',
+      emailUser: document.getElementById('reminder-email')?.value?.trim() || 'audhesh123@gmail.com',
       inAppNotifications: document.getElementById('channel-in-app')?.checked ?? true,
       emailNotifications: document.getElementById('channel-email')?.checked ?? true,
       daily: {
@@ -111,12 +167,12 @@ const Reminders = {
       }
     };
 
-    App.showLoader(true, 'Updating reminder schedules and cron timers...');
+    App.showLoader(true, 'Updating reminder schedules and email dispatch settings...');
     try {
       const res = await API.saveRemindersConfig(updated);
       if (res.success) {
         this.config = res.config;
-        App.showToast('Schedule Saved', `Reminders updated for timezone ${res.config.timezone}`);
+        App.showToast('Schedule Saved', `Reminders configured for ${res.config.notificationEmail} (${res.config.timezone})`);
         Dashboard.loadDashboard();
       }
     } catch (err) {

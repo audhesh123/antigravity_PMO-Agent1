@@ -428,6 +428,25 @@ app.get('/api/reminders/next', (req, res) => {
   res.json({ success: true, next });
 });
 
+// Test direct email delivery to notification email
+app.post('/api/reminders/send-email-test', async (req, res) => {
+  try {
+    const { to, type = 'DSR' } = req.body;
+    const config = storage.getRemindersConfig();
+    const mailer = require('./mailer');
+    const result = await mailer.sendReminderEmail({
+      to: to || config.notificationEmail || 'audhesh123@gmail.com',
+      type,
+      message: config.daily?.message || "Please submit your Daily Status Report (DSR).",
+      scheduledTime: config.daily?.time,
+      timezone: config.timezone
+    });
+    res.json({ success: true, result });
+  } catch (err) {
+    res.status(500).json({ success: false, error: err.message });
+  }
+});
+
 // Start Express Server
 app.listen(PORT, () => {
   console.log(`=======================================================`);
