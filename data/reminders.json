@@ -1,5 +1,20 @@
 [
   {
+    "id": "rem_1794107984497_c3t4cx",
+    "timestamp": "2026-11-08T03:19:44.497Z",
+    "type": "DSR",
+    "channel": "In-App Notification + Email (audhesh123@gmail.com)",
+    "recipient": "audhesh123@gmail.com",
+    "message": "Reminder: Please submit your Daily Status Report (DSR) with today's accomplishments, ongoing activities, blockers, and next steps.",
+    "status": "Delivered",
+    "dedupKey": "DSR_2026-11-07",
+    "meta": {
+      "source": "manual_test",
+      "scheduledTime": "16:00",
+      "timezone": "America/New_York"
+    }
+  },
+  {
     "id": "rem_1794107842565_txsjnm",
     "timestamp": "2026-11-08T03:17:22.565Z",
     "type": "DSR",

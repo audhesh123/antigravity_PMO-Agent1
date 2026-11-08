@@ -135,10 +135,10 @@ const API = {
     });
   },
 
-  async sendEmailTest(to = 'audhesh123@gmail.com', type = 'DSR') {
+  async sendEmailTest(to = 'audhesh123@gmail.com', type = 'DSR', extra = {}) {
     return this.request('/api/reminders/send-email-test', {
       method: 'POST',
-      body: JSON.stringify({ to, type })
+      body: JSON.stringify({ to, type, ...extra })
     });
   },
 

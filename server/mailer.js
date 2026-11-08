@@ -88,9 +88,18 @@ class MailerService {
   /**
    * Dispatches email via Gmail/SMTP, Formspree, Resend, or Simulated Fallback
    */
-  async sendReminderEmail({ to, type = 'DSR', message, scheduledTime, timezone, appUrl }) {
+  async sendReminderEmail(options = {}) {
     const config = storage.getRemindersConfig();
-    const recipient = to || config.notificationEmail || 'audhesh123@gmail.com';
+    const {
+      to,
+      type = 'DSR',
+      message,
+      scheduledTime,
+      timezone,
+      appUrl
+    } = options;
+
+    const recipient = to || options.emailUser || config.notificationEmail || 'audhesh123@gmail.com';
     const subject = type === 'WSR' 
       ? `⏰ [Action Required] Weekly Status Report (WSR) Reminder - ${new Date().toLocaleDateString()}`
       : `⏰ [Action Required] Daily Status Report (DSR) Reminder - ${new Date().toLocaleDateString()}`;
@@ -107,7 +116,7 @@ class MailerService {
     const plainText = `${type} Reminder:\n\n${message}\n\nPlease submit your status report at: ${appUrl || 'http://localhost:3000'}`;
 
     // 1. Check for Formspree integration
-    const formspreeId = process.env.FORMSPREE_FORM_ID || config.formspreeFormId;
+    const formspreeId = options.formspreeId || process.env.FORMSPREE_FORM_ID || config.formspreeFormId;
     if (config.emailProvider === 'formspree' && formspreeId) {
       try {
         console.log(`[MailerService] Sending via Formspree (Form: ${formspreeId}) to ${recipient}...`);
@@ -138,22 +147,39 @@ class MailerService {
       }
     }
 
-    // 2. Check for SMTP / Gmail credentials (via environment or config)
-    const emailUser = process.env.EMAIL_USER || config.emailUser;
-    const emailPass = process.env.EMAIL_PASS || config.emailPass;
+    // 2. Check for SMTP / Gmail credentials (via options, environment, or config)
+    const emailUser = options.emailUser || process.env.EMAIL_USER || config.emailUser || config.notificationEmail || 'audhesh123@gmail.com';
+    let emailPass = (options.emailPass || process.env.EMAIL_PASS || config.emailPass || '').trim();
+
+    // Strip any spaces from the 16-character Google App Password (e.g. "abcd efgh ijkl mnop" -> "abcdefghijklmnop")
+    if (emailPass) {
+      emailPass = emailPass.replace(/\s+/g, '');
+    }
 
     if (emailUser && emailPass) {
       try {
-        console.log(`[MailerService] Dispatching via Gmail/SMTP (${emailUser}) to ${recipient}...`);
-        const transporter = nodemailer.createTransport({
-          host: config.smtpHost || 'smtp.gmail.com',
-          port: parseInt(config.smtpPort || 465, 10),
-          secure: config.smtpSecure !== false,
-          auth: {
-            user: emailUser,
-            pass: emailPass
-          }
-        });
+        console.log(`[MailerService] Dispatching via Gmail SMTP (${emailUser}) to ${recipient}...`);
+        
+        // Use Gmail service transport for Google accounts, or custom host if configured
+        const transportConfig = emailUser.toLowerCase().includes('@gmail.com')
+          ? {
+              service: 'gmail',
+              auth: {
+                user: emailUser,
+                pass: emailPass
+              }
+            }
+          : {
+              host: config.smtpHost || 'smtp.gmail.com',
+              port: parseInt(config.smtpPort || 465, 10),
+              secure: config.smtpSecure !== false,
+              auth: {
+                user: emailUser,
+                pass: emailPass
+              }
+            };
+
+        const transporter = nodemailer.createTransport(transportConfig);
 
         const info = await transporter.sendMail({
           from: `"AI Status Reporting Agent" <${emailUser}>`,
@@ -166,18 +192,22 @@ class MailerService {
         console.log(`[MailerService] Email successfully sent to ${recipient}! Message ID: ${info.messageId}`);
         return { success: true, provider: 'smtp', messageId: info.messageId, recipient };
       } catch (err) {
-        console.error(`[MailerService] SMTP sending failed: ${err.message}`);
-        return { success: false, provider: 'smtp', error: err.message };
+        console.error(`[MailerService] SMTP sending failed:`, err);
+        let userFriendlyError = err.message;
+        if (err.code === 'EAUTH' || err.message.includes('535') || err.message.includes('BadCredentials')) {
+          userFriendlyError = 'Gmail rejected authentication. Please ensure you generated a 16-character App Password at myaccount.google.com/apppasswords (do not use your regular personal Gmail password).';
+        }
+        return { success: false, provider: 'smtp', error: userFriendlyError };
       }
     }
 
     // 3. Fallback: Log and record simulated dispatch
-    console.log(`[MailerService] [SIMULATED DISPATCH] No active SMTP/Formspree credentials yet. Prepared notification for ${recipient}.`);
+    console.log(`[MailerService] [SIMULATED DISPATCH] No active SMTP/Formspree password configured. Prepared notification for ${recipient}.`);
     return {
       success: true,
       provider: 'simulated',
       recipient,
-      note: 'To send live emails, configure either a Gmail App Password (SMTP) or Formspree Form ID in config or .env'
+      note: 'To send live emails, enter your 16-character Gmail App Password and click Save Schedule Settings.'
     };
   }
 }

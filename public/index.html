@@ -535,7 +535,7 @@
           <h2>Automated Reminder System</h2>
           <p>Configure automated DSR and WSR submission prompts, timezones, and delivery audit history.</p>
         </div>
-        <button class="btn btn-primary" id="btn-save-reminders-config">
+        <button class="btn btn-primary btn-save-reminders" id="btn-save-reminders-config">
           💾 Save Schedule Configuration
         </button>
       </div>
@@ -640,8 +640,8 @@
             <button class="btn btn-sm btn-outline" id="btn-send-test-email" style="display: inline-flex; align-items: center; gap: 0.4rem;">
               ✉️ Send Test Email to audhesh123@gmail.com
             </button>
-            <button class="btn btn-sm btn-primary" id="btn-save-reminders-config">
-              Save Schedule Settings
+            <button class="btn btn-sm btn-primary btn-save-reminders" id="btn-save-reminders-config-card">
+              💾 Save Schedule Settings
             </button>
           </div>
         </div>
@@ -681,7 +681,12 @@
         <!-- Conditional Provider Configurations -->
         <div style="display: grid; grid-template-columns: repeat(auto-fit, minmax(280px, 1fr)); gap: 1.5rem; margin-top: 1.25rem; padding-top: 1.25rem; border-top: 1px solid var(--border-color);">
           <div class="form-group" id="group-smtp-pass" style="margin-bottom: 0;">
-            <label class="form-label" for="input-email-pass">Gmail App Password (16 characters)</label>
+            <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 0.35rem;">
+              <label class="form-label" for="input-email-pass" style="margin-bottom: 0;">Gmail App Password (16 characters)</label>
+              <button type="button" id="btn-toggle-pass-visibility" style="background: none; border: none; color: var(--primary); font-size: 0.75rem; cursor: pointer; text-decoration: underline;">
+                Show Password
+              </button>
+            </div>
             <input type="password" id="input-email-pass" class="form-control" placeholder="e.g., abcd efgh ijkl mnop" />
             <small style="font-size: 0.75rem; color: var(--text-muted); display: block; margin-top: 4px;">
               Generated from <a href="https://myaccount.google.com/apppasswords" target="_blank" style="color: var(--primary);">Google Account &rarr; Security &rarr; App Passwords</a>

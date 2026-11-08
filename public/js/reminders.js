@@ -12,9 +12,28 @@ const Reminders = {
   },
 
   bindEvents() {
-    // Save configuration button
-    document.getElementById('btn-save-reminders-config')?.addEventListener('click', () => {
-      this.saveConfig();
+    // Save configuration button (bind to both header and card save buttons)
+    document.querySelectorAll('.btn-save-reminders, #btn-save-reminders-config, #btn-save-reminders-config-card').forEach(btn => {
+      btn.addEventListener('click', (e) => {
+        e.preventDefault();
+        this.saveConfig();
+      });
+    });
+
+    // Toggle password visibility button
+    document.getElementById('btn-toggle-pass-visibility')?.addEventListener('click', (e) => {
+      e.preventDefault();
+      const input = document.getElementById('input-email-pass');
+      const btn = document.getElementById('btn-toggle-pass-visibility');
+      if (input && btn) {
+        if (input.type === 'password') {
+          input.type = 'text';
+          btn.textContent = 'Hide Password';
+        } else {
+          input.type = 'password';
+          btn.textContent = 'Show Password';
+        }
+      }
     });
 
     // Test trigger buttons
@@ -54,17 +73,32 @@ const Reminders = {
 
   async sendTestEmail() {
     const email = document.getElementById('reminder-email')?.value?.trim() || 'audhesh123@gmail.com';
-    App.showLoader(true, `Dispatching test reminder email to ${email}...`);
+    const pass = (document.getElementById('input-email-pass')?.value?.trim() || localStorage.getItem('pmo_email_pass') || '').replace(/\s+/g, '');
+    const provider = document.getElementById('reminder-provider')?.value || 'smtp';
+    const formspreeId = document.getElementById('input-formspree-id')?.value?.trim() || '';
+
+    // Save config first so it permanently persists
+    await this.saveConfig();
+
+    App.showLoader(true, `Connecting to mail server & dispatching reminder to ${email}...`);
 
     try {
-      const res = await API.sendEmailTest(email, 'DSR');
+      const res = await API.sendEmailTest(email, 'DSR', {
+        emailPass: pass,
+        emailUser: email,
+        emailProvider: provider,
+        formspreeFormId: formspreeId
+      });
+
       if (res.success) {
         if (res.result?.provider === 'simulated') {
-          App.showToast('Email Preview Generated', `Prepared reminder for ${email}. (Set Gmail App Password or Formspree ID to send live).`, 'info');
+          App.showToast('Email Preview Generated', `Prepared reminder for ${email}. (Enter your 16-character Gmail App Password to send a live email).`, 'info');
         } else {
-          App.showToast('Email Sent!', `Successfully dispatched DSR reminder to ${email} via ${res.result?.provider || 'mail'}!`);
+          App.showToast('Email Delivered!', `Successfully sent DSR reminder to ${email}! Check your inbox.`);
         }
         await this.loadRemindersView();
+      } else {
+        App.showToast('Delivery Failed', res.error || 'Failed to dispatch email', 'error');
       }
     } catch (err) {
       App.showToast('Email Error', err.message, 'error');
@@ -128,10 +162,11 @@ const Reminders = {
     if (provSelect && cfg.emailProvider) provSelect.value = cfg.emailProvider;
 
     const formspreeInp = document.getElementById('input-formspree-id');
-    if (formspreeInp) formspreeInp.value = cfg.formspreeFormId || '';
+    if (formspreeInp) formspreeInp.value = cfg.formspreeFormId || localStorage.getItem('pmo_formspree_id') || '';
 
     const passInp = document.getElementById('input-email-pass');
-    if (passInp) passInp.value = cfg.emailPass || '';
+    const savedPass = cfg.emailPass || localStorage.getItem('pmo_email_pass') || '';
+    if (passInp) passInp.value = savedPass;
 
     const chInApp = document.getElementById('channel-in-app');
     if (chInApp) chInApp.checked = !!cfg.inAppNotifications;
@@ -143,12 +178,18 @@ const Reminders = {
   },
 
   async saveConfig() {
+    const rawPass = (document.getElementById('input-email-pass')?.value?.trim() || localStorage.getItem('pmo_email_pass') || '').replace(/\s+/g, '');
+    const formspreeId = document.getElementById('input-formspree-id')?.value?.trim() || localStorage.getItem('pmo_formspree_id') || '';
+    
+    if (rawPass) localStorage.setItem('pmo_email_pass', rawPass);
+    if (formspreeId) localStorage.setItem('pmo_formspree_id', formspreeId);
+
     const updated = {
       timezone: document.getElementById('reminder-timezone')?.value || 'America/New_York',
       notificationEmail: document.getElementById('reminder-email')?.value || 'audhesh123@gmail.com',
       emailProvider: document.getElementById('reminder-provider')?.value || 'smtp',
-      formspreeFormId: document.getElementById('input-formspree-id')?.value?.trim() || '',
-      emailPass: document.getElementById('input-email-pass')?.value?.trim() || '',
+      formspreeFormId: formspreeId,
+      emailPass: rawPass,
       emailUser: document.getElementById('reminder-email')?.value?.trim() || 'audhesh123@gmail.com',
       inAppNotifications: document.getElementById('channel-in-app')?.checked ?? true,
       emailNotifications: document.getElementById('channel-email')?.checked ?? true,

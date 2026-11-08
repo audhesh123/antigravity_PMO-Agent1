@@ -431,7 +431,18 @@ app.get('/api/reminders/next', (req, res) => {
 // Test direct email delivery to notification email
 app.post('/api/reminders/send-email-test', async (req, res) => {
   try {
-    const { to, type = 'DSR' } = req.body;
+    const { to, type = 'DSR', emailPass, emailUser, formspreeFormId, emailProvider } = req.body;
+    
+    // If credentials passed in test call, automatically persist them
+    if (emailPass || formspreeFormId || emailProvider || emailUser) {
+      storage.saveRemindersConfig({
+        ...(emailPass ? { emailPass } : {}),
+        ...(emailUser ? { emailUser } : {}),
+        ...(formspreeFormId ? { formspreeFormId } : {}),
+        ...(emailProvider ? { emailProvider } : {})
+      });
+    }
+
     const config = storage.getRemindersConfig();
     const mailer = require('./mailer');
     const result = await mailer.sendReminderEmail({
@@ -439,8 +450,16 @@ app.post('/api/reminders/send-email-test', async (req, res) => {
       type,
       message: config.daily?.message || "Please submit your Daily Status Report (DSR).",
       scheduledTime: config.daily?.time,
-      timezone: config.timezone
+      timezone: config.timezone,
+      emailPass: emailPass || config.emailPass,
+      emailUser: emailUser || config.emailUser || config.notificationEmail || 'audhesh123@gmail.com',
+      formspreeId: formspreeFormId || config.formspreeFormId
     });
+
+    if (result.success === false) {
+      return res.status(400).json({ success: false, error: result.error, provider: result.provider });
+    }
+
     res.json({ success: true, result });
   } catch (err) {
     res.status(500).json({ success: false, error: err.message });
