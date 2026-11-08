@@ -1,0 +1,17 @@
+[09:30] Samantha Reed (Scrum Master): Good morning team. Let's do our daily sprint standup for Project Titan Core Platform. We have several User Stories in flight across In Progress, Completed, and Blocked statuses. Let's review each US item. Marcus, please start.
+[09:45] Marcus Vance (Senior Backend): Thanks Samantha. Here is my update:
+- US-101 (User Authentication & Okta SSO): Completed and merged into staging branch. All unit tests passed with 94% code coverage.
+- US-105 (Stripe 3D-Secure Checkout Flow): Currently working on the payment webhook verification logic. Making steady progress and expect to open a PR by 3:00 PM today.
+No blockers on my tickets today.
+[10:10] Dave Miller (Full Stack Engineer): Morning all. Here is the status on my user stories:
+- US-102 (Shopping Cart Persistent Storage): Currently working on the Redis session sync and cart abandonment auto-save.
+- US-103 (Automated Invoice PDF Generation): Blocked by SecOps team. I am stuck waiting on production AWS S3 bucket KMS key permissions and policy review. Cannot proceed with end-to-end PDF storage testing until this IAM policy is approved.
+[10:35] Samantha Reed (Scrum Master): Thanks Dave. Action item for Samantha: I will escalate US-103 blocker directly with SecOps Director Tom Miller by 11:30 AM to get the KMS encryption keys unblocked today.
+[10:50] Priya Sharma (Cloud Architect): Here is my status update:
+- US-104 (Push Notification Microservice): Completed, finished load testing, and deployed to Kubernetes staging cluster. Sub-10ms dispatch latency verified.
+- US-106 (Loyalty Points Redemption Engine): Currently blocked by third-party ERP vendor SAP. We are waiting on their sandbox API rate limit increase from 10 req/sec to 100 req/sec. The integration tests are currently failing with 429 Too Many Requests.
+[11:15] Elena Rostova (Lead Architect): For US-106, Decision: We agreed to implement an exponential backoff queue with Redis BullMQ as a temporary circuit breaker until SAP upgrades our enterprise tier on Monday. Action item for Priya: Configure Redis BullMQ queue retry policy by 4:00 PM.
+[11:35] Anita Patel (Frontend Lead): Morning everyone. My User Story updates:
+- US-107 (Design System Dark Mode UI Tokens): Finished, visual QA signed off, and completed merge to develop.
+- US-108 (Multi-Currency Dynamic Pricing Widget): In progress and currently building the currency selector dropdown with live FX rate caching.
+[11:55] Samantha Reed (Scrum Master): Great job team. We have 3 User Stories Completed (US-101, US-104, US-107), 3 User Stories In Progress (US-102, US-105, US-108), and 2 User Stories Blocked (US-103, US-106). Overall project health is Amber due to external vendor and SecOps blockers, but engineering delivery remains high. Let's wrap up!
