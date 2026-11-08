@@ -97,8 +97,9 @@ Consolidates daily updates, multi-day trackers, and historical context into:
 
 ### Installation
 ```bash
-# Clone or navigate to the repository
-cd AD_AI_AGENT
+# Clone the repository
+git clone https://github.com/audhesh123/antigravity_PMO-Agent1.git
+cd antigravity_PMO-Agent1
 
 # Install dependencies
 npm install
