@@ -127,6 +127,7 @@ class ReminderService {
     if (config.emailNotifications) {
       mailer.sendReminderEmail({
         to: config.notificationEmail || 'audhesh123@gmail.com',
+        emailUser: config.emailUser || 'audhesh123@gmail.com',
         type: 'DSR',
         message: message,
         scheduledTime: config.daily?.time || '16:00',
@@ -186,6 +187,7 @@ class ReminderService {
     if (config.emailNotifications) {
       mailer.sendReminderEmail({
         to: config.notificationEmail || 'audhesh123@gmail.com',
+        emailUser: config.emailUser || 'audhesh123@gmail.com',
         type: 'WSR',
         message: message,
         scheduledTime: config.weekly?.time || '15:00',

@@ -634,11 +634,11 @@
         <div style="display: flex; align-items: center; justify-content: space-between; flex-wrap: wrap; gap: 1rem; margin-bottom: 1.25rem;">
           <div>
             <h4 style="font-size: 1.1rem; font-weight: 700; margin: 0 0 0.25rem 0;">Notification Delivery & Email Dispatch Settings</h4>
-            <p style="font-size: 0.825rem; color: var(--text-muted); margin: 0;">Configure automated daily dispatch to <strong>audhesh123@gmail.com</strong> via Gmail SMTP or Formspree.</p>
+            <p style="font-size: 0.825rem; color: var(--text-muted); margin: 0;">Configure automated daily dispatch to <strong id="dynamic-recipient-summary">audhesh123@gmail.com</strong> (sent from <strong>audhesh123@gmail.com</strong>).</p>
           </div>
           <div style="display: flex; gap: 0.75rem;">
             <button class="btn btn-sm btn-outline" id="btn-send-test-email" style="display: inline-flex; align-items: center; gap: 0.4rem;">
-              ✉️ Send Test Email to audhesh123@gmail.com
+              ✉️ <span id="label-send-test-email">Send Test Email to audhesh123@gmail.com</span>
             </button>
             <button class="btn btn-sm btn-primary btn-save-reminders" id="btn-save-reminders-config-card">
               💾 Save Schedule Settings
@@ -710,7 +710,7 @@
               </label>
               <label style="display: flex; align-items: center; gap: 0.4rem; font-size: 0.85rem; cursor: pointer;">
                 <input type="checkbox" id="channel-email" checked>
-                Daily Email to audhesh123@gmail.com
+                <span id="label-channel-email">Daily Email to audhesh123@gmail.com</span>
               </label>
             </div>
           </div>

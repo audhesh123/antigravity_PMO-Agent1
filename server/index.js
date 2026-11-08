@@ -504,7 +504,7 @@ app.post('/api/reminders/send-email-test', async (req, res) => {
       scheduledTime: config.daily?.time,
       timezone: config.timezone,
       emailPass: emailPass || config.emailPass,
-      emailUser: emailUser || config.emailUser || config.notificationEmail || 'audhesh123@gmail.com',
+      emailUser: emailUser || config.emailUser || 'audhesh123@gmail.com',
       formspreeId: formspreeFormId || config.formspreeFormId
     });
 

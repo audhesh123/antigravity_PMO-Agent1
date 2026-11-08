@@ -56,10 +56,36 @@ const Reminders = {
       providerSelect.addEventListener('change', () => this.updateProviderVisibility());
     }
 
+    // Dynamic recipient email input listener
+    const emailInput = document.getElementById('reminder-email');
+    if (emailInput) {
+      emailInput.addEventListener('input', (e) => this.updateDynamicEmailLabels(e.target.value));
+      emailInput.addEventListener('change', (e) => this.updateDynamicEmailLabels(e.target.value));
+    }
+
     // Timezone change
     document.getElementById('reminder-timezone')?.addEventListener('change', () => {
       this.saveConfig();
     });
+  },
+
+  updateDynamicEmailLabels(email) {
+    const currentEmail = (email || document.getElementById('reminder-email')?.value || '').trim() || 'audhesh123@gmail.com';
+    
+    const testBtnLabel = document.getElementById('label-send-test-email');
+    if (testBtnLabel) {
+      testBtnLabel.textContent = `Send Test Email to ${currentEmail}`;
+    }
+
+    const summaryLabel = document.getElementById('dynamic-recipient-summary');
+    if (summaryLabel) {
+      summaryLabel.textContent = currentEmail;
+    }
+
+    const channelLabel = document.getElementById('label-channel-email');
+    if (channelLabel) {
+      channelLabel.textContent = `Daily Email to ${currentEmail}`;
+    }
   },
 
   updateProviderVisibility() {
@@ -80,12 +106,12 @@ const Reminders = {
     // Save config first so it permanently persists
     await this.saveConfig();
 
-    App.showLoader(true, `Connecting to mail server & dispatching reminder to ${email}...`);
+    App.showLoader(true, `Connecting to mail server & dispatching reminder from audhesh123@gmail.com to ${email}...`);
 
     try {
       const res = await API.sendEmailTest(email, 'DSR', {
         emailPass: pass,
-        emailUser: email,
+        emailUser: 'audhesh123@gmail.com', // Always send FROM audhesh123@gmail.com (configured account)
         emailProvider: provider,
         formspreeFormId: formspreeId
       });
@@ -94,7 +120,7 @@ const Reminders = {
         if (res.result?.provider === 'simulated') {
           App.showToast('Email Preview Generated', `Prepared reminder for ${email}. (Enter your 16-character Gmail App Password to send a live email).`, 'info');
         } else {
-          App.showToast('Email Delivered!', `Successfully sent DSR reminder to ${email}! Check your inbox.`);
+          App.showToast('Email Delivered!', `Successfully sent DSR reminder to ${email} from audhesh123@gmail.com! Check your inbox.`);
         }
         await this.loadRemindersView();
       } else {
@@ -156,7 +182,10 @@ const Reminders = {
     if (tzSelect && cfg.timezone) tzSelect.value = cfg.timezone;
 
     const emailInp = document.getElementById('reminder-email');
-    if (emailInp) emailInp.value = cfg.notificationEmail || 'audhesh123@gmail.com';
+    if (emailInp) {
+      emailInp.value = cfg.notificationEmail || 'audhesh123@gmail.com';
+      this.updateDynamicEmailLabels(emailInp.value);
+    }
 
     const provSelect = document.getElementById('reminder-provider');
     if (provSelect && cfg.emailProvider) provSelect.value = cfg.emailProvider;
@@ -180,17 +209,18 @@ const Reminders = {
   async saveConfig() {
     const rawPass = (document.getElementById('input-email-pass')?.value?.trim() || localStorage.getItem('pmo_email_pass') || '').replace(/\s+/g, '');
     const formspreeId = document.getElementById('input-formspree-id')?.value?.trim() || localStorage.getItem('pmo_formspree_id') || '';
+    const recipientEmail = document.getElementById('reminder-email')?.value?.trim() || 'audhesh123@gmail.com';
     
     if (rawPass) localStorage.setItem('pmo_email_pass', rawPass);
     if (formspreeId) localStorage.setItem('pmo_formspree_id', formspreeId);
 
     const updated = {
       timezone: document.getElementById('reminder-timezone')?.value || 'America/New_York',
-      notificationEmail: document.getElementById('reminder-email')?.value || 'audhesh123@gmail.com',
+      notificationEmail: recipientEmail,
       emailProvider: document.getElementById('reminder-provider')?.value || 'smtp',
       formspreeFormId: formspreeId,
       emailPass: rawPass,
-      emailUser: document.getElementById('reminder-email')?.value?.trim() || 'audhesh123@gmail.com',
+      emailUser: 'audhesh123@gmail.com', // Always audhesh123@gmail.com (the account configured with the App Password)
       inAppNotifications: document.getElementById('channel-in-app')?.checked ?? true,
       emailNotifications: document.getElementById('channel-email')?.checked ?? true,
       daily: {
